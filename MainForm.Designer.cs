@@ -97,7 +97,7 @@
             // lblOutputFolder
             // 
             lblOutputFolder.AutoSize = true;
-            lblOutputFolder.Location = new Point(38, 122);
+            lblOutputFolder.Location = new Point(22, 124);
             lblOutputFolder.Name = "lblOutputFolder";
             lblOutputFolder.Size = new Size(84, 15);
             lblOutputFolder.TabIndex = 6;
@@ -105,20 +105,21 @@
             // 
             // txtOutputFolder
             // 
-            txtOutputFolder.Location = new Point(128, 119);
+            txtOutputFolder.Location = new Point(112, 119);
             txtOutputFolder.Name = "txtOutputFolder";
             txtOutputFolder.ReadOnly = true;
-            txtOutputFolder.Size = new Size(240, 23);
+            txtOutputFolder.Size = new Size(279, 23);
             txtOutputFolder.TabIndex = 7;
             // 
             // btnBrowseOutput
             // 
-            btnBrowseOutput.Location = new Point(374, 119);
+            btnBrowseOutput.Location = new Point(397, 120);
             btnBrowseOutput.Name = "btnBrowseOutput";
             btnBrowseOutput.Size = new Size(75, 23);
             btnBrowseOutput.TabIndex = 8;
             btnBrowseOutput.Text = "Browse...";
             btnBrowseOutput.UseVisualStyleBackColor = true;
+            btnBrowseOutput.Click += btnBrowseOutput_Click;
             // 
             // btnExtract
             // 
@@ -158,6 +159,7 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Crestron Panel Extractor";
+            Load += MainForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }
