@@ -28,12 +28,152 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            lblHost = new Label();
+            lblUsername = new Label();
+            txtUsername = new TextBox();
+            lblPassword = new Label();
+            txtPassword = new TextBox();
+            txtHost = new TextBox();
+            lblOutputFolder = new Label();
+            txtOutputFolder = new TextBox();
+            btnBrowseOutput = new Button();
+            btnExtract = new Button();
+            btnTestConnection = new Button();
+            SuspendLayout();
+            // 
+            // lblHost
+            // 
+            lblHost.AutoSize = true;
+            lblHost.Location = new Point(109, 9);
+            lblHost.Name = "lblHost";
+            lblHost.Size = new Size(56, 15);
+            lblHost.TabIndex = 0;
+            lblHost.Text = "Host / IP:";
+            lblHost.Click += label1_Click;
+            // 
+            // lblUsername
+            // 
+            lblUsername.AutoSize = true;
+            lblUsername.Location = new Point(111, 43);
+            lblUsername.Name = "lblUsername";
+            lblUsername.Size = new Size(63, 15);
+            lblUsername.TabIndex = 1;
+            lblUsername.Text = "Username:";
+            // 
+            // txtUsername
+            // 
+            txtUsername.Location = new Point(216, 35);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new Size(100, 23);
+            txtUsername.TabIndex = 2;
+            txtUsername.Text = "admin";
+            // 
+            // lblPassword
+            // 
+            lblPassword.AutoSize = true;
+            lblPassword.Location = new Point(111, 77);
+            lblPassword.Name = "lblPassword";
+            lblPassword.Size = new Size(60, 15);
+            lblPassword.TabIndex = 3;
+            lblPassword.Text = "Password:";
+            // 
+            // txtPassword
+            // 
+            txtPassword.Location = new Point(216, 64);
+            txtPassword.Name = "txtPassword";
+            txtPassword.Size = new Size(100, 23);
+            txtPassword.TabIndex = 4;
+            txtPassword.Text = "password";
+            txtPassword.UseSystemPasswordChar = true;
+            // 
+            // txtHost
+            // 
+            txtHost.Location = new Point(216, 6);
+            txtHost.Name = "txtHost";
+            txtHost.Size = new Size(100, 23);
+            txtHost.TabIndex = 5;
+            txtHost.Text = "192.168.1.1";
+            // 
+            // lblOutputFolder
+            // 
+            lblOutputFolder.AutoSize = true;
+            lblOutputFolder.Location = new Point(38, 122);
+            lblOutputFolder.Name = "lblOutputFolder";
+            lblOutputFolder.Size = new Size(84, 15);
+            lblOutputFolder.TabIndex = 6;
+            lblOutputFolder.Text = "Output Folder:";
+            // 
+            // txtOutputFolder
+            // 
+            txtOutputFolder.Location = new Point(128, 119);
+            txtOutputFolder.Name = "txtOutputFolder";
+            txtOutputFolder.ReadOnly = true;
+            txtOutputFolder.Size = new Size(240, 23);
+            txtOutputFolder.TabIndex = 7;
+            // 
+            // btnBrowseOutput
+            // 
+            btnBrowseOutput.Location = new Point(374, 119);
+            btnBrowseOutput.Name = "btnBrowseOutput";
+            btnBrowseOutput.Size = new Size(75, 23);
+            btnBrowseOutput.TabIndex = 8;
+            btnBrowseOutput.Text = "Browse...";
+            btnBrowseOutput.UseVisualStyleBackColor = true;
+            // 
+            // btnExtract
+            // 
+            btnExtract.Location = new Point(241, 194);
+            btnExtract.Name = "btnExtract";
+            btnExtract.Size = new Size(75, 23);
+            btnExtract.TabIndex = 9;
+            btnExtract.Text = "Extract VTZ";
+            btnExtract.UseVisualStyleBackColor = true;
+            // 
+            // btnTestConnection
+            // 
+            btnTestConnection.Location = new Point(132, 194);
+            btnTestConnection.Name = "btnTestConnection";
+            btnTestConnection.Size = new Size(103, 23);
+            btnTestConnection.TabIndex = 10;
+            btnTestConnection.Text = "Test Connection";
+            btnTestConnection.UseVisualStyleBackColor = true;
+            // 
+            // MainForm
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(484, 281);
+            Controls.Add(btnTestConnection);
+            Controls.Add(btnExtract);
+            Controls.Add(btnBrowseOutput);
+            Controls.Add(txtOutputFolder);
+            Controls.Add(lblOutputFolder);
+            Controls.Add(txtHost);
+            Controls.Add(txtPassword);
+            Controls.Add(lblPassword);
+            Controls.Add(txtUsername);
+            Controls.Add(lblUsername);
+            Controls.Add(lblHost);
+            MinimumSize = new Size(500, 320);
+            Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Crestron Panel Extractor";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
+
+        private Label lblHost;
+        private Label lblUsername;
+        private TextBox txtUsername;
+        private Label lblPassword;
+        private TextBox txtPassword;
+        private TextBox txtHost;
+        private Label lblOutputFolder;
+        private TextBox txtOutputFolder;
+        private Button btnBrowseOutput;
+        private Button btnExtract;
+        private Button btnTestConnection;
     }
 }
