@@ -39,6 +39,8 @@
             btnBrowseOutput = new Button();
             btnExtract = new Button();
             btnTestConnection = new Button();
+            txtLog = new TextBox();
+            lblLog = new Label();
             SuspendLayout();
             // 
             // lblHost
@@ -49,7 +51,6 @@
             lblHost.Size = new Size(56, 15);
             lblHost.TabIndex = 0;
             lblHost.Text = "Host / IP:";
-            lblHost.Click += label1_Click;
             // 
             // lblUsername
             // 
@@ -123,7 +124,7 @@
             // 
             // btnExtract
             // 
-            btnExtract.Location = new Point(241, 194);
+            btnExtract.Location = new Point(247, 161);
             btnExtract.Name = "btnExtract";
             btnExtract.Size = new Size(75, 23);
             btnExtract.TabIndex = 9;
@@ -132,18 +133,39 @@
             // 
             // btnTestConnection
             // 
-            btnTestConnection.Location = new Point(132, 194);
+            btnTestConnection.Location = new Point(138, 161);
             btnTestConnection.Name = "btnTestConnection";
             btnTestConnection.Size = new Size(103, 23);
             btnTestConnection.TabIndex = 10;
             btnTestConnection.Text = "Test Connection";
             btnTestConnection.UseVisualStyleBackColor = true;
             // 
+            // txtLog
+            // 
+            txtLog.Location = new Point(77, 211);
+            txtLog.Multiline = true;
+            txtLog.Name = "txtLog";
+            txtLog.ReadOnly = true;
+            txtLog.ScrollBars = ScrollBars.Vertical;
+            txtLog.Size = new Size(327, 68);
+            txtLog.TabIndex = 11;
+            // 
+            // lblLog
+            // 
+            lblLog.AutoSize = true;
+            lblLog.Location = new Point(216, 193);
+            lblLog.Name = "lblLog";
+            lblLog.Size = new Size(30, 15);
+            lblLog.TabIndex = 12;
+            lblLog.Text = "Log:";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(484, 281);
+            Controls.Add(lblLog);
+            Controls.Add(txtLog);
             Controls.Add(btnTestConnection);
             Controls.Add(btnExtract);
             Controls.Add(btnBrowseOutput);
@@ -159,7 +181,6 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Crestron Panel Extractor";
-            Load += MainForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -177,5 +198,7 @@
         private Button btnBrowseOutput;
         private Button btnExtract;
         private Button btnTestConnection;
+        private TextBox txtLog;
+        private Label lblLog;
     }
 }

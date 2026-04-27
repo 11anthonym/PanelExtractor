@@ -2,14 +2,22 @@ namespace CrestronPanelExtractor
 {
     public partial class MainForm : Form
     {
+        private bool showDebugLog = false;
         public MainForm()
         {
             InitializeComponent();
+            ApplyDebugVisibility();
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void ApplyDebugVisibility()
         {
+            txtLog.Visible = showDebugLog;
+            lblLog.Visible = showDebugLog;
+        }
 
+        private void AppendLog(string message)
+        {
+            txtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}{Environment.NewLine}");
         }
 
         private void btnBrowseOutput_Click(object sender, EventArgs e)
@@ -25,12 +33,8 @@ namespace CrestronPanelExtractor
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
                 txtOutputFolder.Text = dialog.SelectedPath;
+                AppendLog($"Output folder selected: {dialog.SelectedPath}");
             }
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }
