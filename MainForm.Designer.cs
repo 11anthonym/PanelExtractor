@@ -63,11 +63,10 @@
             // 
             // txtUsername
             // 
-            txtUsername.Location = new Point(216, 35);
+            txtUsername.Location = new Point(216, 40);
             txtUsername.Name = "txtUsername";
             txtUsername.Size = new Size(100, 23);
             txtUsername.TabIndex = 2;
-            txtUsername.Text = "admin";
             // 
             // lblPassword
             // 
@@ -80,11 +79,10 @@
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(216, 64);
+            txtPassword.Location = new Point(216, 74);
             txtPassword.Name = "txtPassword";
             txtPassword.Size = new Size(100, 23);
             txtPassword.TabIndex = 4;
-            txtPassword.Text = "password";
             txtPassword.UseSystemPasswordChar = true;
             // 
             // txtHost
@@ -93,7 +91,7 @@
             txtHost.Name = "txtHost";
             txtHost.Size = new Size(100, 23);
             txtHost.TabIndex = 5;
-            txtHost.Text = "192.168.1.1";
+            txtHost.TextChanged += txtHost_TextChanged;
             // 
             // lblOutputFolder
             // 
@@ -139,6 +137,7 @@
             btnTestConnection.TabIndex = 10;
             btnTestConnection.Text = "Test Connection";
             btnTestConnection.UseVisualStyleBackColor = true;
+            btnTestConnection.Click += btnTestConnection_Click;
             // 
             // txtLog
             // 
