@@ -139,6 +139,7 @@
             btnTestConnection.TabIndex = 10;
             btnTestConnection.Text = "Test Connection";
             btnTestConnection.UseVisualStyleBackColor = true;
+            btnTestConnection.Click += btnTestConnection_Click;
             // 
             // txtLog
             // 
