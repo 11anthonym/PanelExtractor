@@ -91,7 +91,6 @@
             txtHost.Name = "txtHost";
             txtHost.Size = new Size(100, 23);
             txtHost.TabIndex = 5;
-            txtHost.TextChanged += txtHost_TextChanged;
             // 
             // lblOutputFolder
             // 
@@ -128,6 +127,7 @@
             btnExtract.TabIndex = 9;
             btnExtract.Text = "Extract VTZ";
             btnExtract.UseVisualStyleBackColor = true;
+            btnExtract.Click += btnExtract_Click;
             // 
             // btnTestConnection
             // 
@@ -141,18 +141,18 @@
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(77, 211);
+            txtLog.Location = new Point(22, 211);
             txtLog.Multiline = true;
             txtLog.Name = "txtLog";
             txtLog.ReadOnly = true;
             txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(327, 68);
+            txtLog.Size = new Size(450, 68);
             txtLog.TabIndex = 11;
             // 
             // lblLog
             // 
             lblLog.AutoSize = true;
-            lblLog.Location = new Point(216, 193);
+            lblLog.Location = new Point(232, 193);
             lblLog.Name = "lblLog";
             lblLog.Size = new Size(30, 15);
             lblLog.TabIndex = 12;
