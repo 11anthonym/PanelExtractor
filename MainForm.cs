@@ -1,5 +1,7 @@
+using System.Net;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using Renci.SshNet;
-using System.Diagnostics;
 
 namespace CrestronPanelExtractor
 {
@@ -105,9 +107,30 @@ namespace CrestronPanelExtractor
             }
         }
 
-        private bool IsValidIpAddress(string ipAddress)
-        {
 
+        private bool LooksLikeIpv4Address(string value)
+        {
+            return Regex.IsMatch(value, @"^[0-9.]+$");
+        }
+
+        private bool IsValidIpv4Address(string value)
+        {
+            if (!IPAddress.TryParse(value, out IPAddress? parsedAddress))
+            {
+                return false;
+            }
+
+            if (parsedAddress.AddressFamily != AddressFamily.InterNetwork)
+            {
+                return false;
+            }
+
+            if (value.Split('.').Length != 4)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void btnExtract_Click(object sender, EventArgs e)
