@@ -10,7 +10,7 @@ namespace CrestronPanelExtractor
     {
         private const string RemoteDisplayPath = "/display";
         private bool showDebugLog = false;
-        private bool ProgramDebug = true;
+        private bool programDebug = true;
 
         public MainForm()
         {
@@ -56,10 +56,22 @@ namespace CrestronPanelExtractor
             txtLog.Visible = showDebugLog;
             lblLog.Visible = showDebugLog;
         }
-
         private void AppendLog(string message)
         {
             txtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}{Environment.NewLine}");
+        }
+
+        private string CreateTempExtractionFolder()
+        {
+            string tempFolder = Path.Combine(
+                Path.GetTempPath(),
+                "CrestronPanelExtractor",
+                Guid.NewGuid().ToString()
+            );
+
+            Directory.CreateDirectory(tempFolder);
+
+            return tempFolder;
         }
 
         private void btnBrowseOutput_Click(object sender, EventArgs e)
@@ -144,7 +156,7 @@ namespace CrestronPanelExtractor
 
         private void btnExtract_Click(object sender, EventArgs e)
         {
-            if (ProgramDebug)
+            if (programDebug)
             {
                 Debug.WriteLine("Extract Button Clicked");
             }
@@ -181,6 +193,13 @@ namespace CrestronPanelExtractor
 
             try
             {
+                string tempExtractionFolder = CreateTempExtractionFolder();
+
+                if (programDebug)
+                {
+                    Debug.WriteLine($"Temp extraction folder: {tempExtractionFolder}");
+                }
+                
                 Debug.WriteLine($"Listing {RemoteDisplayPath} on {host}...");
 
                 var connectionInfo = new ConnectionInfo(
