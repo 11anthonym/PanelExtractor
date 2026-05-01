@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
@@ -9,6 +10,7 @@ namespace CrestronPanelExtractor
     public partial class MainForm : Form
     {
         private const string RemoteDisplayPath = "/display";
+
         private bool showDebugLog = false;
         private bool programDebug = true;
 
@@ -51,14 +53,30 @@ namespace CrestronPanelExtractor
             // If all checks passed, treat it as a valid IPv4 address.
             return true;
         }
+
         private void ApplyDebugVisibility()
         {
             txtLog.Visible = showDebugLog;
             lblLog.Visible = showDebugLog;
         }
+
         private void AppendLog(string message)
         {
             txtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}{Environment.NewLine}");
+        }
+
+        private string GetUniqueFilePath(string folder, string fileNameWithoutExtension, string extension)
+        {
+            string filePath = Path.Combine(folder, fileNameWithoutExtension + extension);
+            int counter = 1;
+
+            while (File.Exists(filePath))
+            {
+                filePath = Path.Combine(folder, $"{fileNameWithoutExtension}_{counter}{extension}");
+                counter++;
+            }
+
+            return filePath;
         }
 
         private string CreateTempExtractionFolder()
@@ -75,7 +93,7 @@ namespace CrestronPanelExtractor
         }
 
         private void DownloadRemoteDirectory(SftpClient sftp, string remoteDirectory, string localDirectory)
-        { 
+        {
             Directory.CreateDirectory(localDirectory);
 
             var items = sftp.ListDirectory(remoteDirectory)
@@ -102,8 +120,37 @@ namespace CrestronPanelExtractor
                     sftp.DownloadFile(remotePath, fileStream);
                 }
             }
-        } 
+        }
 
+        private string CreateVtzArchive(string tempExtractionFolder, string outputFolder)
+        {
+            string[] vtxFiles = Directory.GetFiles(tempExtractionFolder, "*.vtx", SearchOption.TopDirectoryOnly);
+
+            if (vtxFiles.Length == 0)
+            {
+                throw new InvalidOperationException("No .vtx file was found in the downloaded display folder.");
+            }
+
+            if (vtxFiles.Length > 1)
+            {
+                throw new InvalidOperationException("Multiple .vtx files were found in the downloaded /display folder.");
+            }
+
+            string vtxFile = vtxFiles[0];
+            string projectName = Path.GetFileNameWithoutExtension(vtxFile);
+            string outputVtzPath = GetUniqueFilePath(outputFolder, projectName, ".vtz");
+
+            ZipFile.CreateFromDirectory(
+                tempExtractionFolder,
+                outputVtzPath,
+                CompressionLevel.Optimal,
+                includeBaseDirectory: false
+            );
+
+            return outputVtzPath;
+        }
+
+        // Button clicks
         private void btnBrowseOutput_Click(object sender, EventArgs e)
         {
             using var dialog = new FolderBrowserDialog();
@@ -130,6 +177,17 @@ namespace CrestronPanelExtractor
             if (string.IsNullOrWhiteSpace(host))
             {
                 MessageBox.Show("Enter a host or IP address.", "Missing Host", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (LooksLikeIpv4Address(host) && !IsValidIpv4Address(host))
+            {
+                MessageBox.Show(
+                    "The value entered looks like an IPv4 address, but it is not valid.",
+                    "Invalid IP Address",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
                 return;
             }
 
@@ -168,18 +226,36 @@ namespace CrestronPanelExtractor
 
                 if (displayFolderExists)
                 {
-                    MessageBox.Show("Connection successful. /display folder found.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    AppendLog("Connection successful. /display folder found.");
+                    MessageBox.Show(
+                        "Connection successful. Expected touchpanel file contents found.",
+                        "Success",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+
+                    AppendLog("Connection successful. Expected touchpanel file contents found.");
                 }
                 else
                 {
-                    MessageBox.Show("Connection successful, but /display folder was not found.", "Folder Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    AppendLog("Connection successful, but /display folder was not found.");
+                    MessageBox.Show(
+                        "Connection successful, but expected touchpanel file contents were not found.",
+                        "Folder Missing",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+                    AppendLog("Connection successful, but expected touchpanel file contents were not found.");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Connection failed:{Environment.NewLine}{ex.Message}", "Connection Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    $"Connection failed:{Environment.NewLine}{ex.Message}",
+                    "Connection Failed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+
                 AppendLog($"Connection failed: {ex.Message}");
             }
         }
@@ -194,8 +270,9 @@ namespace CrestronPanelExtractor
             string host = txtHost.Text.Trim();
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Text;
+            string? tempExtractionFolder = null;
 
-            if(string.IsNullOrWhiteSpace(host))
+            if (string.IsNullOrWhiteSpace(host))
             {
                 MessageBox.Show("Enter a host or IP address.", "Missing Host", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -204,14 +281,17 @@ namespace CrestronPanelExtractor
             if (LooksLikeIpv4Address(host) && !IsValidIpv4Address(host))
             {
                 MessageBox.Show(
-                    "The value entered looks like an IPv4 address, but it is not valid.", "Invalid IP Address",MessageBoxButtons.OK,MessageBoxIcon.Warning
+                    "The value entered looks like an IPv4 address, but it is not valid.",
+                    "Invalid IP Address",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
                 );
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(username))
             {
-                MessageBox.Show("Enter a username.", "Missing username.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Enter a username.", "Missing Username", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -223,14 +303,15 @@ namespace CrestronPanelExtractor
 
             try
             {
-                string tempExtractionFolder = CreateTempExtractionFolder();
+                tempExtractionFolder = CreateTempExtractionFolder();
+                string outputFolder;
 
                 if (programDebug)
                 {
                     Debug.WriteLine($"Temp extraction folder: {tempExtractionFolder}");
                 }
-                
-                Debug.WriteLine($"Downloading {RemoteDisplayPath} on {host}...");
+
+                Debug.WriteLine($"Downloading {RemoteDisplayPath} from {host}...");
 
                 var connectionInfo = new ConnectionInfo(
                     host,
@@ -251,22 +332,45 @@ namespace CrestronPanelExtractor
 
                 Debug.WriteLine($"Downloaded {RemoteDisplayPath} to {tempExtractionFolder}");
 
+                if (string.IsNullOrWhiteSpace(txtOutputFolder.Text))
+                {
+                    outputFolder = AppContext.BaseDirectory;
+                }
+                else
+                {
+                    outputFolder = txtOutputFolder.Text;
+                }
+
+                string outputVtzPath = CreateVtzArchive(tempExtractionFolder, outputFolder);
+
                 MessageBox.Show(
-                    $"Downloaded /display to:{Environment.NewLine}{tempExtractionFolder}",
-                    "Download Complete",
+                    $"VTZ created successfully:{Environment.NewLine}{outputVtzPath}",
+                    "Extraction Complete",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"Extract test failed:{Environment.NewLine}{ex.Message}",
-                    "Extract Test Failed",
+                    $"Extraction failed:{Environment.NewLine}{ex.Message}",
+                    "Extraction Failed",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
+            }
+            finally
+            {
+                if (!string.IsNullOrWhiteSpace(tempExtractionFolder) &&
+                    Directory.Exists(tempExtractionFolder))
+                {
+                    Directory.Delete(tempExtractionFolder, recursive: true);
+
+                    if (programDebug)
+                    {
+                        Debug.WriteLine($"Temp folder cleaned up successfully: {tempExtractionFolder}");
+                    }
+                }
             }
         }
     }
