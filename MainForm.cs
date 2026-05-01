@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using Renci.SshNet;
+using System.IO.Compression;
 
 namespace CrestronPanelExtractor
 {
@@ -61,6 +62,20 @@ namespace CrestronPanelExtractor
             txtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}{Environment.NewLine}");
         }
 
+        private string GetUniqueFilePath(string folder, string fileNameWithoutExtension, string extension)
+        {
+            string filePath = Path.Combine(folder, fileNameWithoutExtension + extension);
+            int counter = 1;
+
+            while (File.Exists(filePath))
+            {
+                filePath = Path.Combine(folder, $"{fileNameWithoutExtension}_{counter}{extension}");
+                counter++;
+            }
+
+            return filePath;
+        }
+
         private string CreateTempExtractionFolder()
         {
             string tempFolder = Path.Combine(
@@ -104,6 +119,36 @@ namespace CrestronPanelExtractor
             }
         } 
 
+        private string CreateVtzArchive(string tempExtractionFolder, string outputFolder)
+        {
+            string[] vtxFiles = Directory.GetFiles(tempExtractionFolder, "*.vtx", SearchOption.TopDirectoryOnly);
+
+            if (vtxFiles.Length == 0)
+            {
+                throw new InvalidOperationException("No .vtx file was found in the downloaded display folder.");
+            }
+
+            if (vtxFiles.Length > 1)
+            {
+                throw new InvalidOperationException("Multiple .vtx files were found in the downloaded /display folder.");
+            }
+
+            string vtxFile = vtxFiles[0];
+            string projectName = Path.GetFileNameWithoutExtension(vtxFile);
+            string outputVtzPath = GetUniqueFilePath(outputFolder, projectName, ".vtz");
+
+            ZipFile.CreateFromDirectory(
+                tempExtractionFolder,
+                outputVtzPath,
+                CompressionLevel.Optimal,
+                includeBaseDirectory: false
+            );
+
+            return outputVtzPath;
+        }
+
+
+        // Button clicks
         private void btnBrowseOutput_Click(object sender, EventArgs e)
         {
             using var dialog = new FolderBrowserDialog();
@@ -224,6 +269,7 @@ namespace CrestronPanelExtractor
             try
             {
                 string tempExtractionFolder = CreateTempExtractionFolder();
+                string outputFolder;
 
                 if (programDebug)
                 {
@@ -251,9 +297,20 @@ namespace CrestronPanelExtractor
 
                 Debug.WriteLine($"Downloaded {RemoteDisplayPath} to {tempExtractionFolder}");
 
+                if (string.IsNullOrWhiteSpace(txtOutputFolder.Text))
+                {
+                    outputFolder = AppContext.BaseDirectory;
+                }
+                else
+                {
+                    outputFolder = txtOutputFolder.Text;
+                }
+
+                string outputVtzPath = CreateVtzArchive(tempExtractionFolder, outputFolder);
+
                 MessageBox.Show(
-                    $"Downloaded /display to:{Environment.NewLine}{tempExtractionFolder}",
-                    "Download Complete",
+                    $"VTZ created successfully:{Environment.NewLine}{outputVtzPath}",
+                    "Extraction Complete",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
