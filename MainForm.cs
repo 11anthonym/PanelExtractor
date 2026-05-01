@@ -74,6 +74,36 @@ namespace CrestronPanelExtractor
             return tempFolder;
         }
 
+        private void DownloadRemoteDirectory(SftpClient sftp, string remoteDirectory, string localDirectory)
+        { 
+            Directory.CreateDirectory(localDirectory);
+
+            var items = sftp.ListDirectory(remoteDirectory)
+                .Where(item => item.Name != "." && item.Name != "..")
+                .ToList();
+
+            foreach (var item in items)
+            {
+                string remotePath = $"{remoteDirectory.TrimEnd('/')}/{item.Name}";
+                string localPath = Path.Combine(localDirectory, item.Name);
+
+                if (item.IsDirectory)
+                {
+                    DownloadRemoteDirectory(sftp, remotePath, localPath);
+                }
+                else if (item.IsRegularFile)
+                {
+                    if (programDebug)
+                    {
+                        Debug.WriteLine($"Downloading {remotePath}");
+                    }
+
+                    using FileStream fileStream = File.Create(localPath);
+                    sftp.DownloadFile(remotePath, fileStream);
+                }
+            }
+        } 
+
         private void btnBrowseOutput_Click(object sender, EventArgs e)
         {
             using var dialog = new FolderBrowserDialog();
@@ -200,7 +230,7 @@ namespace CrestronPanelExtractor
                     Debug.WriteLine($"Temp extraction folder: {tempExtractionFolder}");
                 }
                 
-                Debug.WriteLine($"Listing {RemoteDisplayPath} on {host}...");
+                Debug.WriteLine($"Downloading {RemoteDisplayPath} on {host}...");
 
                 var connectionInfo = new ConnectionInfo(
                     host,
@@ -215,26 +245,20 @@ namespace CrestronPanelExtractor
 
                 sftp.Connect();
 
-                var items = sftp.ListDirectory(RemoteDisplayPath)
-                    .Where(item => item.Name != "." && item.Name != "..")
-                    .ToList();
+                DownloadRemoteDirectory(sftp, RemoteDisplayPath, tempExtractionFolder);
 
                 sftp.Disconnect();
 
-                Debug.WriteLine($"Found {items.Count} item(s) in {RemoteDisplayPath}:");
-
-                foreach (var item in items)
-                {
-                    Debug.WriteLine($"- {item.Name}");
-                }
+                Debug.WriteLine($"Downloaded {RemoteDisplayPath} to {tempExtractionFolder}");
 
                 MessageBox.Show(
-                    $"Found {items.Count} item(s) in {RemoteDisplayPath}.",
-                    "Directory Listed",
+                    $"Downloaded /display to:{Environment.NewLine}{tempExtractionFolder}",
+                    "Download Complete",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show(
