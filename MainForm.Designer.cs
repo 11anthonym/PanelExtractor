@@ -41,6 +41,7 @@
             btnTestConnection = new Button();
             txtLog = new TextBox();
             lblLog = new Label();
+            lblStatus = new Label();
             SuspendLayout();
             // 
             // lblHost
@@ -55,7 +56,7 @@
             // lblUsername
             // 
             lblUsername.AutoSize = true;
-            lblUsername.Location = new Point(111, 43);
+            lblUsername.Location = new Point(109, 43);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new Size(63, 15);
             lblUsername.TabIndex = 1;
@@ -65,13 +66,13 @@
             // 
             txtUsername.Location = new Point(216, 40);
             txtUsername.Name = "txtUsername";
-            txtUsername.Size = new Size(100, 23);
+            txtUsername.Size = new Size(111, 23);
             txtUsername.TabIndex = 2;
             // 
             // lblPassword
             // 
             lblPassword.AutoSize = true;
-            lblPassword.Location = new Point(111, 77);
+            lblPassword.Location = new Point(109, 77);
             lblPassword.Name = "lblPassword";
             lblPassword.Size = new Size(60, 15);
             lblPassword.TabIndex = 3;
@@ -81,7 +82,7 @@
             // 
             txtPassword.Location = new Point(216, 74);
             txtPassword.Name = "txtPassword";
-            txtPassword.Size = new Size(100, 23);
+            txtPassword.Size = new Size(111, 23);
             txtPassword.TabIndex = 4;
             txtPassword.UseSystemPasswordChar = true;
             // 
@@ -89,7 +90,7 @@
             // 
             txtHost.Location = new Point(216, 6);
             txtHost.Name = "txtHost";
-            txtHost.Size = new Size(100, 23);
+            txtHost.Size = new Size(111, 23);
             txtHost.TabIndex = 5;
             // 
             // lblOutputFolder
@@ -121,9 +122,9 @@
             // 
             // btnExtract
             // 
-            btnExtract.Location = new Point(247, 161);
+            btnExtract.Location = new Point(257, 161);
             btnExtract.Name = "btnExtract";
-            btnExtract.Size = new Size(75, 23);
+            btnExtract.Size = new Size(103, 23);
             btnExtract.TabIndex = 9;
             btnExtract.Text = "Extract VTZ";
             btnExtract.UseVisualStyleBackColor = true;
@@ -141,28 +142,39 @@
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(22, 211);
+            txtLog.Location = new Point(2, 242);
             txtLog.Multiline = true;
             txtLog.Name = "txtLog";
             txtLog.ReadOnly = true;
             txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(450, 68);
+            txtLog.Size = new Size(481, 37);
             txtLog.TabIndex = 11;
             // 
             // lblLog
             // 
             lblLog.AutoSize = true;
-            lblLog.Location = new Point(232, 193);
+            lblLog.Location = new Point(232, 224);
             lblLog.Name = "lblLog";
             lblLog.Size = new Size(30, 15);
             lblLog.TabIndex = 12;
             lblLog.Text = "Log:";
+            // 
+            // lblStatus
+            // 
+            lblStatus.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblStatus.Location = new Point(22, 192);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(450, 25);
+            lblStatus.TabIndex = 13;
+            lblStatus.Text = "Ready";
+            lblStatus.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(484, 281);
+            Controls.Add(lblStatus);
             Controls.Add(lblLog);
             Controls.Add(txtLog);
             Controls.Add(btnTestConnection);
@@ -199,5 +211,6 @@
         private Button btnTestConnection;
         private TextBox txtLog;
         private Label lblLog;
+        private Label lblStatus;
     }
 }

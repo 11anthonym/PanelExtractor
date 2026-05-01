@@ -74,6 +74,11 @@ namespace CrestronPanelExtractor
             Cursor = isBusy ? Cursors.WaitCursor : Cursors.Default;
         }
 
+        private void SetStatus(string message)
+        {
+            lblStatus.Text = message;
+        }
+
         private string GetUniqueFilePath(string folder, string fileNameWithoutExtension, string extension)
         {
             string filePath = Path.Combine(folder, fileNameWithoutExtension + extension);
@@ -185,12 +190,14 @@ namespace CrestronPanelExtractor
 
             if (string.IsNullOrWhiteSpace(host))
             {
+                SetStatus("Missing host or IP address.");
                 MessageBox.Show("Enter a host or IP address.", "Missing Host", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (LooksLikeIpv4Address(host) && !IsValidIpv4Address(host))
             {
+                SetStatus("Invalid IP address.");
                 MessageBox.Show(
                     "The value entered looks like an IPv4 address, but it is not valid.",
                     "Invalid IP Address",
@@ -202,12 +209,14 @@ namespace CrestronPanelExtractor
 
             if (string.IsNullOrWhiteSpace(username))
             {
+                SetStatus("Missing username.");
                 MessageBox.Show("Enter a username.", "Missing Username", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(password))
             {
+                SetStatus("Missing password.");
                 MessageBox.Show("Enter a password.", "Missing Password", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -215,8 +224,7 @@ namespace CrestronPanelExtractor
             try
             {
                 SetBusyState(true);
-
-                AppendLog($"Testing SFTP connection to {host}...");
+                SetStatus("Preparing connection test...");
 
                 var connectionInfo = new ConnectionInfo(
                     host,
@@ -229,47 +237,48 @@ namespace CrestronPanelExtractor
 
                 using var sftp = new SftpClient(connectionInfo);
 
+                SetStatus("Connecting to touch panel...");
                 sftp.Connect();
 
+                SetStatus("Checking for touch panel file contents...");
                 bool displayFolderExists = sftp.Exists(RemoteDisplayPath);
 
                 sftp.Disconnect();
 
                 if (displayFolderExists)
                 {
+                    SetStatus("Connection successful. Touch panel files found.");
+
                     MessageBox.Show(
-                        "Connection successful. Expected touchpanel file contents found.",
+                        "Connection successful. Expected touch panel file contents found.",
                         "Success",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information
                     );
-
-                    AppendLog("Connection successful. Expected touchpanel file contents found.");
                 }
                 else
                 {
+                    SetStatus("Connected, but touch panel files were not found.");
+
                     MessageBox.Show(
-                        "Connection successful, but expected touchpanel file contents were not found.",
+                        "Connection successful, but expected touch panel file contents were not found.",
                         "Folder Missing",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning
                     );
-
-                    AppendLog("Connection successful, but expected touchpanel file contents were not found.");
                 }
             }
             catch (Exception ex)
             {
+                SetStatus("Connection test failed.");
+
                 MessageBox.Show(
                     $"Connection failed:{Environment.NewLine}{ex.Message}",
                     "Connection Failed",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
-
-                AppendLog($"Connection failed: {ex.Message}");
             }
-
             finally
             {
                 SetBusyState(false);
@@ -320,7 +329,8 @@ namespace CrestronPanelExtractor
             try
             {
                 SetBusyState(true);
-                
+                SetStatus("Creating temporary workspace...");
+
                 tempExtractionFolder = CreateTempExtractionFolder();
                 string outputFolder;
 
@@ -342,8 +352,10 @@ namespace CrestronPanelExtractor
 
                 using var sftp = new SftpClient(connectionInfo);
 
+                SetStatus("Connecting to touch panel...");
                 sftp.Connect();
 
+                SetStatus("Downloading touch panel files...");
                 DownloadRemoteDirectory(sftp, RemoteDisplayPath, tempExtractionFolder);
 
                 sftp.Disconnect();
@@ -359,7 +371,9 @@ namespace CrestronPanelExtractor
                     outputFolder = txtOutputFolder.Text;
                 }
 
+                SetStatus("Creating VTZ archive...");
                 string outputVtzPath = CreateVtzArchive(tempExtractionFolder, outputFolder);
+                SetStatus("Extraction complete.");
 
                 MessageBox.Show(
                     $"VTZ created successfully:{Environment.NewLine}{outputVtzPath}",
@@ -370,6 +384,7 @@ namespace CrestronPanelExtractor
             }
             catch (Exception ex)
             {
+                SetStatus("Extraction failed.");
                 MessageBox.Show(
                     $"Extraction failed:{Environment.NewLine}{ex.Message}",
                     "Extraction Failed",
