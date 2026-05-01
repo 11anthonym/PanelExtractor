@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using Renci.SshNet;
+using System.IO.Compression;
 
 namespace CrestronPanelExtractor
 {
