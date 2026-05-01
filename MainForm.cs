@@ -65,6 +65,15 @@ namespace CrestronPanelExtractor
             txtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}{Environment.NewLine}");
         }
 
+        private void SetBusyState(bool isBusy)
+        {
+            btnExtract.Enabled = !isBusy;
+            btnTestConnection.Enabled = !isBusy;
+            btnBrowseOutput.Enabled = !isBusy;
+
+            Cursor = isBusy ? Cursors.WaitCursor : Cursors.Default;
+        }
+
         private string GetUniqueFilePath(string folder, string fileNameWithoutExtension, string extension)
         {
             string filePath = Path.Combine(folder, fileNameWithoutExtension + extension);
@@ -205,6 +214,8 @@ namespace CrestronPanelExtractor
 
             try
             {
+                SetBusyState(true);
+
                 AppendLog($"Testing SFTP connection to {host}...");
 
                 var connectionInfo = new ConnectionInfo(
@@ -258,6 +269,11 @@ namespace CrestronPanelExtractor
 
                 AppendLog($"Connection failed: {ex.Message}");
             }
+
+            finally
+            {
+                SetBusyState(false);
+            }
         }
 
         private void btnExtract_Click(object sender, EventArgs e)
@@ -303,6 +319,8 @@ namespace CrestronPanelExtractor
 
             try
             {
+                SetBusyState(true);
+                
                 tempExtractionFolder = CreateTempExtractionFolder();
                 string outputFolder;
 
@@ -361,6 +379,8 @@ namespace CrestronPanelExtractor
             }
             finally
             {
+                SetBusyState(false);
+
                 if (!string.IsNullOrWhiteSpace(tempExtractionFolder) &&
                     Directory.Exists(tempExtractionFolder))
                 {
