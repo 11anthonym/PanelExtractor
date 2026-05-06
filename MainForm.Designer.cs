@@ -40,8 +40,9 @@
             btnExtract = new Button();
             btnTestConnection = new Button();
             txtLog = new TextBox();
-            lblLog = new Label();
             lblStatus = new Label();
+            btnToggleDetails = new Button();
+            lblLog = new Label();
             SuspendLayout();
             // 
             // lblHost
@@ -56,7 +57,7 @@
             // lblUsername
             // 
             lblUsername.AutoSize = true;
-            lblUsername.Location = new Point(109, 43);
+            lblUsername.Location = new Point(109, 37);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new Size(63, 15);
             lblUsername.TabIndex = 1;
@@ -64,15 +65,15 @@
             // 
             // txtUsername
             // 
-            txtUsername.Location = new Point(216, 40);
+            txtUsername.Location = new Point(200, 34);
             txtUsername.Name = "txtUsername";
-            txtUsername.Size = new Size(111, 23);
+            txtUsername.Size = new Size(127, 23);
             txtUsername.TabIndex = 2;
             // 
             // lblPassword
             // 
             lblPassword.AutoSize = true;
-            lblPassword.Location = new Point(109, 77);
+            lblPassword.Location = new Point(109, 67);
             lblPassword.Name = "lblPassword";
             lblPassword.Size = new Size(60, 15);
             lblPassword.TabIndex = 3;
@@ -80,23 +81,23 @@
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(216, 74);
+            txtPassword.Location = new Point(200, 63);
             txtPassword.Name = "txtPassword";
-            txtPassword.Size = new Size(111, 23);
+            txtPassword.Size = new Size(127, 23);
             txtPassword.TabIndex = 4;
             txtPassword.UseSystemPasswordChar = true;
             // 
             // txtHost
             // 
-            txtHost.Location = new Point(216, 6);
+            txtHost.Location = new Point(200, 6);
             txtHost.Name = "txtHost";
-            txtHost.Size = new Size(111, 23);
+            txtHost.Size = new Size(127, 23);
             txtHost.TabIndex = 5;
             // 
             // lblOutputFolder
             // 
             lblOutputFolder.AutoSize = true;
-            lblOutputFolder.Location = new Point(22, 124);
+            lblOutputFolder.Location = new Point(22, 114);
             lblOutputFolder.Name = "lblOutputFolder";
             lblOutputFolder.Size = new Size(84, 15);
             lblOutputFolder.TabIndex = 6;
@@ -104,7 +105,7 @@
             // 
             // txtOutputFolder
             // 
-            txtOutputFolder.Location = new Point(112, 119);
+            txtOutputFolder.Location = new Point(112, 109);
             txtOutputFolder.Name = "txtOutputFolder";
             txtOutputFolder.ReadOnly = true;
             txtOutputFolder.Size = new Size(279, 23);
@@ -112,7 +113,7 @@
             // 
             // btnBrowseOutput
             // 
-            btnBrowseOutput.Location = new Point(397, 120);
+            btnBrowseOutput.Location = new Point(397, 110);
             btnBrowseOutput.Name = "btnBrowseOutput";
             btnBrowseOutput.Size = new Size(75, 23);
             btnBrowseOutput.TabIndex = 8;
@@ -122,7 +123,7 @@
             // 
             // btnExtract
             // 
-            btnExtract.Location = new Point(257, 161);
+            btnExtract.Location = new Point(265, 146);
             btnExtract.Name = "btnExtract";
             btnExtract.Size = new Size(103, 23);
             btnExtract.TabIndex = 9;
@@ -132,7 +133,7 @@
             // 
             // btnTestConnection
             // 
-            btnTestConnection.Location = new Point(138, 161);
+            btnTestConnection.Location = new Point(129, 146);
             btnTestConnection.Name = "btnTestConnection";
             btnTestConnection.Size = new Size(103, 23);
             btnTestConnection.TabIndex = 10;
@@ -142,38 +143,50 @@
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(2, 242);
+            txtLog.Location = new Point(2, 258);
             txtLog.Multiline = true;
             txtLog.Name = "txtLog";
             txtLog.ReadOnly = true;
             txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(481, 37);
+            txtLog.Size = new Size(481, 90);
             txtLog.TabIndex = 11;
-            // 
-            // lblLog
-            // 
-            lblLog.AutoSize = true;
-            lblLog.Location = new Point(232, 224);
-            lblLog.Name = "lblLog";
-            lblLog.Size = new Size(30, 15);
-            lblLog.TabIndex = 12;
-            lblLog.Text = "Log:";
             // 
             // lblStatus
             // 
             lblStatus.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblStatus.Location = new Point(22, 192);
+            lblStatus.Location = new Point(17, 172);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(450, 25);
             lblStatus.TabIndex = 13;
             lblStatus.Text = "Ready";
             lblStatus.TextAlign = ContentAlignment.MiddleCenter;
             // 
+            // btnToggleDetails
+            // 
+            btnToggleDetails.Location = new Point(198, 209);
+            btnToggleDetails.Name = "btnToggleDetails";
+            btnToggleDetails.Size = new Size(88, 23);
+            btnToggleDetails.TabIndex = 14;
+            btnToggleDetails.Text = "Show Details";
+            btnToggleDetails.UseVisualStyleBackColor = true;
+            btnToggleDetails.Click += btnToggleDetails_Click;
+            // 
+            // lblLog
+            // 
+            lblLog.AutoSize = true;
+            lblLog.Location = new Point(220, 240);
+            lblLog.Name = "lblLog";
+            lblLog.Size = new Size(45, 15);
+            lblLog.TabIndex = 12;
+            lblLog.Text = "Details:";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(484, 281);
+            BackColor = Color.LightSkyBlue;
+            ClientSize = new Size(484, 350);
+            Controls.Add(btnToggleDetails);
             Controls.Add(lblStatus);
             Controls.Add(lblLog);
             Controls.Add(txtLog);
@@ -210,7 +223,8 @@
         private Button btnExtract;
         private Button btnTestConnection;
         private TextBox txtLog;
-        private Label lblLog;
         private Label lblStatus;
+        private Button btnToggleDetails;
+        private Label lblLog;
     }
 }
