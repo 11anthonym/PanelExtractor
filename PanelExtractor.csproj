@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net48</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>latest</LangVersion>
+		<AssemblyVersion>1.1.1.0</AssemblyVersion>
+		<FileVersion>1.1.1.0</FileVersion>
+		<Version>1.1.1</Version>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		<AssemblyName>PanelExtractor</AssemblyName>
+		<AssemblyTitle>Panel Extractor</AssemblyTitle>
+		<Product>Panel Extractor</Product>
+		<Description>Recovers deployed project files from compatible touch panels.</Description>
+		<ApplicationIcon>Assets\PanelExtractor.ico</ApplicationIcon>
+		<Copyright>© 2026 Anthony Moretti</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FluentFTP" Version="54.2.0" />
+		<PackageReference Include="SSH.NET" Version="2026.0.0" />
+		<PackageReference Include="System.Text.Json" Version="10.0.10" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="LICENSE" CopyToPublishDirectory="PreserveNewest" />
+		<None Update="THIRD-PARTY-NOTICES.md" CopyToPublishDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="PanelExtractor.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="PanelExtractor.Tests\**\*.cs" />
+	</ItemGroup>
+
+
+</Project>
