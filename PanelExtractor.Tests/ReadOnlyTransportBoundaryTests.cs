@@ -6,7 +6,8 @@ namespace PanelExtractor.Tests;
 public class ReadOnlyTransportBoundaryTests
 {
     [TestMethod]
-    [DynamicData(nameof(ClientTypes))]
+    [DataRow(typeof(ReadOnlySftpClient))]
+    [DataRow(typeof(ReadOnlyFtpClient))]
     public void Client_ExposesOnlyApprovedReadOperations(Type clientType)
     {
         string[] expectedMethods =
@@ -26,7 +27,7 @@ public class ReadOnlyTransportBoundaryTests
         string[] actualMethods = exposedMethods.Select(method => method.Name).OrderBy(name => name).ToArray();
 
         Assert.IsTrue(clientType.IsSealed);
-        CollectionAssert.AreEqual(expectedMethods.OrderBy(name => name).ToArray(), actualMethods);
+        CollectionAssert.AreEqual(expectedMethods, actualMethods);
         Assert.IsFalse(exposedMethods.Any(ExposesTransportLibraryType));
     }
 
@@ -61,14 +62,8 @@ public class ReadOnlyTransportBoundaryTests
             .OrderBy(name => name)
             .ToArray();
 
-        CollectionAssert.AreEqual(expectedMethods.OrderBy(name => name).ToArray(), actualMethods);
+        CollectionAssert.AreEqual(expectedMethods, actualMethods);
     }
-
-    public static IEnumerable<object[]> ClientTypes =>
-    [
-        [typeof(ReadOnlySftpClient)],
-        [typeof(ReadOnlyFtpClient)]
-    ];
 
     private static bool ExposesTransportLibraryType(MethodInfo method)
     {

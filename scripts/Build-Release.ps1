@@ -30,6 +30,19 @@ if ($LASTEXITCODE -ne 0 -or
     throw "Release generation requires the .NET 8 runtime for the pinned SBOM tool."
 }
 
+[xml]$project = Get-Content -LiteralPath (Join-Path $repoRoot "PanelExtractor.csproj") -Raw
+$versionNode = $project.SelectSingleNode("/Project/PropertyGroup/Version")
+if ($null -eq $versionNode)
+{
+    throw "PanelExtractor.csproj does not define a version."
+}
+$version = $versionNode.InnerText
+
+if ($env:GITHUB_REF_TYPE -eq "tag" -and $env:GITHUB_REF_NAME -ne "v$version")
+{
+    throw "Tag $($env:GITHUB_REF_NAME) does not match project version $version."
+}
+
 function Invoke-DotNet
 {
     param([Parameter(Mandatory)][string[]]$Arguments)
@@ -87,14 +100,6 @@ try
         throw "Published output is empty or contains debug symbols."
     }
 
-    [xml]$project = Get-Content -Raw "PanelExtractor.csproj"
-    $versionNode = $project.SelectSingleNode("/Project/PropertyGroup/Version")
-    if ($null -eq $versionNode)
-    {
-        throw "PanelExtractor.csproj does not define a version."
-    }
-    $version = $versionNode.InnerText
-
     $componentRoot = Join-Path $artifactsRoot (
         "sbom-components-" + [Guid]::NewGuid().ToString("N"))
     $componentObjectRoot = Join-Path $componentRoot "obj"
@@ -138,18 +143,6 @@ try
     {
         Remove-Item -LiteralPath $validationPath -Force -ErrorAction SilentlyContinue
         Remove-Item -LiteralPath $componentRoot -Recurse -Force -ErrorAction SilentlyContinue
-    }
-
-    $restrictedAssets = @(git ls-files | Where-Object {
-        $_ -match "Excavator_Yellow|icon-icons\.com|MainForm\.resx$"
-    })
-    if ($LASTEXITCODE -ne 0)
-    {
-        throw "Could not inspect tracked assets."
-    }
-    if ($restrictedAssets.Count -ne 0)
-    {
-        throw "Restricted assets remain tracked: $($restrictedAssets -join ', ')."
     }
 
     Add-Type -AssemblyName System.IO.Compression

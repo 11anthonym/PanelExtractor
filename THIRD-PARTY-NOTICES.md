@@ -2,7 +2,7 @@
 
 Panel Extractor includes the following MIT-licensed runtime dependencies:
 
-- [FluentFTP](https://github.com/robinrodricks/FluentFTP), copyright © 2015 Robin Rodricks, Michael Stiemke, and FluentFTP contributors
+- [FluentFTP](https://github.com/robinrodricks/FluentFTP), copyright © 2015 Robin Rodricks and FluentFTP contributors
 - [SSH.NET](https://github.com/sshnet/SSH.NET), copyright © Renci, Oleg Kapeljushnik, Gert Driesen, and contributors
 - [Bouncy Castle C#](https://github.com/bcgit/bc-csharp), copyright © 2000–2026 The Legion of the Bouncy Castle Inc.
 - [.NET runtime libraries](https://github.com/dotnet/runtime), including System.Text.Json and supporting assemblies, copyright © Microsoft Corporation and contributors

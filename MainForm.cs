@@ -154,7 +154,7 @@ namespace PanelExtractor
 
         private async Task DeleteTempExtractionFolderAsync(string? folder)
         {
-            if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
+            if (folder is null || !Directory.Exists(folder))
             {
                 return;
             }

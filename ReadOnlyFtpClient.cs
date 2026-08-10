@@ -8,6 +8,8 @@ namespace PanelExtractor
     // Keeps FluentFTP's mutation-capable types behind a read-only application surface.
     internal sealed class ReadOnlyFtpClient : IReadOnlyPanelFileClient
     {
+        private const int TimeoutMilliseconds = 5000;
+
         private readonly AsyncFtpClient client;
 
         public string ProtocolName => "FTP (unencrypted)";
@@ -16,10 +18,10 @@ namespace PanelExtractor
         {
             var config = new FtpConfig
             {
-                ConnectTimeout = 5000,
-                ReadTimeout = 5000,
-                DataConnectionConnectTimeout = 5000,
-                DataConnectionReadTimeout = 5000,
+                ConnectTimeout = TimeoutMilliseconds,
+                ReadTimeout = TimeoutMilliseconds,
+                DataConnectionConnectTimeout = TimeoutMilliseconds,
+                DataConnectionReadTimeout = TimeoutMilliseconds,
                 DataConnectionType = FtpDataConnectionType.AutoPassive,
                 EncryptionMode = FtpEncryptionMode.None
             };
