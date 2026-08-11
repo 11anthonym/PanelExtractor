@@ -8,6 +8,8 @@ namespace PanelExtractor
     // Keeps SSH.NET's mutation-capable types behind a read-only application surface.
     internal sealed class ReadOnlySftpClient : IReadOnlyPanelFileClient
     {
+        private const int Port = 22;
+
         private readonly SftpClient client;
         private readonly SshHostKeyVerifier hostKeyVerifier;
         private PanelHostKeyException? hostKeyFailure;
@@ -27,7 +29,7 @@ namespace PanelExtractor
         {
             var connectionInfo = new ConnectionInfo(
                 host,
-                22,
+                Port,
                 username,
                 new PasswordAuthenticationMethod(username, password)
             )
@@ -36,7 +38,7 @@ namespace PanelExtractor
             };
 
             client = new SftpClient(connectionInfo);
-            hostKeyVerifier = new SshHostKeyVerifier(host, 22, hostKeys);
+            hostKeyVerifier = new SshHostKeyVerifier(host, Port, hostKeys);
             client.HostKeyReceived += VerifyHostKey;
         }
 
@@ -65,10 +67,6 @@ namespace PanelExtractor
             catch (Exception) when (hostKeyFailure is not null)
             {
                 throw hostKeyFailure;
-            }
-            catch (PanelConnectionException)
-            {
-                throw;
             }
             catch (SshAuthenticationException ex)
             {

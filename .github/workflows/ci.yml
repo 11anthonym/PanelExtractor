@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - master
   pull_request:
 
 permissions:
@@ -29,6 +31,9 @@ jobs:
 
       - name: Restore
         run: dotnet restore PanelExtractor.sln
+
+      - name: Verify formatting
+        run: dotnet format PanelExtractor.sln --verify-no-changes --no-restore
 
       - name: Verify remote transports remain read-only
         shell: pwsh

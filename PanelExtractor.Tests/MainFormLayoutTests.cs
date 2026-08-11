@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace PanelExtractor.Tests;
@@ -23,6 +24,10 @@ public class MainFormLayoutTests
 
             Assert.AreEqual("PanelExtractor", typeof(MainForm).Assembly.GetName().Name);
             Assert.AreEqual("Panel Extractor", form.Text);
+            using System.Drawing.Icon? executableIcon = System.Drawing.Icon.ExtractAssociatedIcon(
+                typeof(MainForm).Assembly.Location);
+            Assert.IsNotNull(executableIcon);
+            CollectionAssert.AreEqual(ToPng(executableIcon), ToPng(form.Icon));
             Assert.AreEqual("Allow legacy FTP fallback (unencrypted)", legacyFtp.Text);
             Assert.IsTrue(form.ClientRectangle.Contains(legacyFtp.Bounds));
             Assert.IsFalse(legacyFtp.Bounds.IntersectsWith(outputFolder.Bounds));
@@ -69,6 +74,14 @@ public class MainFormLayoutTests
     {
         return parent.Controls.Find(name, searchAllChildren: true).Single() as T
             ?? throw new AssertFailedException($"Control {name} was not a {typeof(T).Name}.");
+    }
+
+    private static byte[] ToPng(System.Drawing.Icon icon)
+    {
+        using var bitmap = icon.ToBitmap();
+        using var stream = new MemoryStream();
+        bitmap.Save(stream, ImageFormat.Png);
+        return stream.ToArray();
     }
 
     private static void RunOnStaThread(Action action)
