@@ -43,7 +43,6 @@ namespace PanelExtractor
             btnTestConnection.Enabled = !isBusy;
             btnBrowseOutput.Enabled = !isBusy;
             chkAllowLegacyFtp.Enabled = !isBusy;
-            forgetSavedSshHostKeysToolStripMenuItem.Enabled = !isBusy;
 
             Cursor = isBusy ? Cursors.WaitCursor : Cursors.Default;
         }
@@ -100,7 +99,45 @@ namespace PanelExtractor
             return tempFolder;
         }
 
-        private Task<IReadOnlyPanelFileClient> ConnectToPanelAsync(
+        private async Task<IReadOnlyPanelFileClient> ConnectToPanelAsync(
+            string host,
+            string username,
+            string password)
+        {
+            try
+            {
+                return await TryConnectToPanelAsync(host, username, password);
+            }
+            catch (PanelHostKeyException ex) when (ex.IsIdentityChange)
+            {
+                if (!ConfirmPanelIdentityChange(ex))
+                {
+                    throw;
+                }
+
+                try
+                {
+                    SshHostKeyStore.Default.Replace(
+                        ex.Host!,
+                        ex.Port,
+                        ex.SavedFingerprint!,
+                        ex.PresentedFingerprint!);
+                }
+                catch (Exception replaceException) when (
+                    replaceException is InvalidDataException or IOException or UnauthorizedAccessException or
+                    System.Security.SecurityException)
+                {
+                    throw new PanelHostKeyException(
+                        "The new SSH identity could not be saved safely. SFTP was stopped.",
+                        replaceException);
+                }
+
+                AppendLog($"Trusted the new SSH identity for {ex.Host}:{ex.Port}.");
+                return await TryConnectToPanelAsync(host, username, password);
+            }
+        }
+
+        private Task<IReadOnlyPanelFileClient> TryConnectToPanelAsync(
             string host,
             string username,
             string password)
@@ -111,6 +148,24 @@ namespace PanelExtractor
                 chkAllowLegacyFtp.Checked,
                 AppendLog,
                 CancellationToken.None);
+        }
+
+        private bool ConfirmPanelIdentityChange(PanelHostKeyException exception)
+        {
+            DialogResult result = MessageBox.Show(
+                this,
+                $"The SSH identity for {exception.Host} has changed.\n\n" +
+                "This can happen if the panel was reset or replaced, but it can also mean " +
+                "another device is answering at this address.\n\n" +
+                $"Saved fingerprint:\n{exception.SavedFingerprint}\n\n" +
+                $"New fingerprint:\n{exception.PresentedFingerprint}\n\n" +
+                "Trust this new identity and try again?",
+                "Panel Identity Changed",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2);
+
+            return result == DialogResult.Yes;
         }
 
         private async Task DownloadRemoteDirectoryAsync(
@@ -348,24 +403,6 @@ namespace PanelExtractor
             Close();
         }
 
-        private void forgetSavedSshHostKeysToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string status = SshHostKeyStore.Default.Clear()
-                    ? "Saved SSH host keys were forgotten."
-                    : "No saved SSH host keys were found.";
-
-                lblStatus.Text = status;
-                AppendLog(status);
-            }
-            catch (Exception ex)
-            {
-                lblStatus.Text = "Saved SSH host keys could not be cleared.";
-                AppendLog($"Saved SSH host key cleanup failed: {ex.Message}");
-            }
-        }
-
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(
@@ -388,7 +425,7 @@ namespace PanelExtractor
             MessageBox.Show(
                 "Enter the panel address and credentials. Test Connection can be used to confirm the panel is reachable before extracting.\n\n" +
                 "SFTP is always tried first. Enable legacy FTP fallback only for older panels that require unencrypted FTP.\n\n" +
-                "The first successful SFTP connection remembers the panel's SSH identity. Unexpected identity changes are blocked automatically.\n\n" +
+                "The first successful SFTP connection remembers the panel's SSH identity. If it later changes, only that panel's new identity can be approved.\n\n" +
                 "Extract VTZ downloads the deployed touch panel files and packages them into a VTZ archive.\n\n" +
                 "If no output folder is selected, the file is saved in the same folder the program was launched from.\n\n" +
                 "If a file with the same name already exists, a numbered copy is created instead of overwriting it.\n\n" +

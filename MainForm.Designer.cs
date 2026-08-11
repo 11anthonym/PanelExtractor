@@ -45,8 +45,6 @@
             lblLog = new Label();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
-            forgetSavedSshHostKeysToolStripMenuItem = new ToolStripMenuItem();
-            toolStripSeparator1 = new ToolStripSeparator();
             exitToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
@@ -211,27 +209,14 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { forgetSavedSshHostKeysToolStripMenuItem, toolStripSeparator1, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
-            //
-            // forgetSavedSshHostKeysToolStripMenuItem
-            //
-            forgetSavedSshHostKeysToolStripMenuItem.Name = "forgetSavedSshHostKeysToolStripMenuItem";
-            forgetSavedSshHostKeysToolStripMenuItem.Size = new Size(230, 22);
-            forgetSavedSshHostKeysToolStripMenuItem.Text = "Forget Saved SSH Host Keys";
-            forgetSavedSshHostKeysToolStripMenuItem.Click += forgetSavedSshHostKeysToolStripMenuItem_Click;
-            //
-            // toolStripSeparator1
-            //
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(227, 6);
-            //
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(230, 22);
+            exitToolStripMenuItem.Size = new Size(180, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -309,8 +294,6 @@
         private Label lblLog;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileToolStripMenuItem;
-        private ToolStripMenuItem forgetSavedSshHostKeysToolStripMenuItem;
-        private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem exitToolStripMenuItem;
         private ToolStripMenuItem helpToolStripMenuItem;
         private ToolStripMenuItem aboutToolStripMenuItem;

@@ -21,6 +21,9 @@ public class MainFormLayoutTests
             TextBox outputFolder = FindControl<TextBox>(form, "txtOutputFolder");
             Button toggleDetails = FindControl<Button>(form, "btnToggleDetails");
             TextBox log = FindControl<TextBox>(form, "txtLog");
+            ToolStripMenuItem fileMenu = form.MainMenuStrip!.Items
+                .OfType<ToolStripMenuItem>()
+                .Single(item => item.Text == "File");
 
             Assert.AreEqual("PanelExtractor", typeof(MainForm).Assembly.GetName().Name);
             Assert.AreEqual("Panel Extractor", form.Text);
@@ -29,6 +32,9 @@ public class MainFormLayoutTests
             Assert.IsNotNull(executableIcon);
             CollectionAssert.AreEqual(ToPng(executableIcon), ToPng(form.Icon));
             Assert.AreEqual("Allow legacy FTP fallback (unencrypted)", legacyFtp.Text);
+            CollectionAssert.AreEqual(
+                new[] { "Exit" },
+                fileMenu.DropDownItems.Cast<ToolStripItem>().Select(item => item.Text).ToArray());
             Assert.IsTrue(form.ClientRectangle.Contains(legacyFtp.Bounds));
             Assert.IsFalse(legacyFtp.Bounds.IntersectsWith(outputFolder.Bounds));
             Assert.IsGreaterThanOrEqualTo(legacyFtp.Width, legacyFtp.PreferredSize.Width);

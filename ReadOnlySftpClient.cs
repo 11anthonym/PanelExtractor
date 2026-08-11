@@ -10,6 +10,7 @@ namespace PanelExtractor
     {
         private const int Port = 22;
 
+        private readonly string host;
         private readonly SftpClient client;
         private readonly SshHostKeyVerifier hostKeyVerifier;
         private PanelHostKeyException? hostKeyFailure;
@@ -27,6 +28,8 @@ namespace PanelExtractor
             string password,
             SshHostKeyStore hostKeys)
         {
+            this.host = host;
+
             var connectionInfo = new ConnectionInfo(
                 host,
                 Port,
@@ -85,8 +88,10 @@ namespace PanelExtractor
                 if (!hostKeyVerifier.CanTrust(e.FingerPrintSHA256))
                 {
                     hostKeyFailure = new PanelHostKeyException(
-                        "The SSH identity for this panel has changed. SFTP was stopped. " +
-                        "If the panel was replaced or reset, use File > Forget Saved SSH Host Keys and try again.");
+                        host,
+                        Port,
+                        hostKeyVerifier.SavedFingerprint!,
+                        hostKeyVerifier.PresentedFingerprint!);
                 }
             }
             catch (Exception ex) when (
