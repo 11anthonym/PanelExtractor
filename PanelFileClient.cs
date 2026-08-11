@@ -39,9 +39,36 @@ namespace PanelExtractor
     {
     }
 
-    internal sealed class PanelHostKeyException(string message, Exception? innerException = null)
-        : PanelConnectionException(message, innerException)
+    internal sealed class PanelHostKeyException : PanelConnectionException
     {
+        public string? Host { get; }
+
+        public int Port { get; }
+
+        public string? SavedFingerprint { get; }
+
+        public string? PresentedFingerprint { get; }
+
+        public bool IsIdentityChange =>
+            Host is not null && SavedFingerprint is not null && PresentedFingerprint is not null;
+
+        public PanelHostKeyException(string message, Exception? innerException = null)
+            : base(message, innerException)
+        {
+        }
+
+        public PanelHostKeyException(
+            string host,
+            int port,
+            string savedFingerprint,
+            string presentedFingerprint)
+            : base($"The SSH identity for {host} has changed. SFTP was stopped.")
+        {
+            Host = host;
+            Port = port;
+            SavedFingerprint = savedFingerprint;
+            PresentedFingerprint = presentedFingerprint;
+        }
     }
 
     internal sealed class PanelTransportUnavailableException(string message, Exception innerException)

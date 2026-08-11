@@ -30,10 +30,19 @@ namespace PanelExtractor
 
         public SshHostKeyStatus Check(string host, int port, string fingerprint)
         {
+            return Check(host, port, fingerprint, out _);
+        }
+
+        internal SshHostKeyStatus Check(
+            string host,
+            int port,
+            string fingerprint,
+            out string? savedFingerprint)
+        {
             lock (syncRoot)
             {
                 Dictionary<string, string> keys = Load();
-                if (!keys.TryGetValue(CreateHostId(host, port), out string? savedFingerprint))
+                if (!keys.TryGetValue(CreateHostId(host, port), out savedFingerprint))
                 {
                     return SshHostKeyStatus.Unknown;
                 }
@@ -62,17 +71,26 @@ namespace PanelExtractor
             }
         }
 
-        public bool Clear()
+        public void Replace(
+            string host,
+            int port,
+            string expectedFingerprint,
+            string replacementFingerprint)
         {
             lock (syncRoot)
             {
-                if (!File.Exists(filePath))
+                Dictionary<string, string> keys = Load();
+                string hostId = CreateHostId(host, port);
+
+                if (!keys.TryGetValue(hostId, out string? savedFingerprint) ||
+                    !string.Equals(savedFingerprint, expectedFingerprint, StringComparison.Ordinal))
                 {
-                    return false;
+                    throw new InvalidDataException(
+                        "The saved SSH identity changed before it could be replaced.");
                 }
 
-                File.Delete(filePath);
-                return true;
+                keys[hostId] = replacementFingerprint;
+                Save(keys);
             }
         }
 
@@ -133,6 +151,10 @@ namespace PanelExtractor
     {
         private string? pendingFingerprint;
 
+        public string? SavedFingerprint { get; private set; }
+
+        public string? PresentedFingerprint { get; private set; }
+
         public bool CanTrust(string fingerprint)
         {
             if (pendingFingerprint is not null)
@@ -140,10 +162,19 @@ namespace PanelExtractor
                 return string.Equals(pendingFingerprint, fingerprint, StringComparison.Ordinal);
             }
 
-            SshHostKeyStatus status = store.Check(host, port, fingerprint);
+            SshHostKeyStatus status = store.Check(
+                host,
+                port,
+                fingerprint,
+                out string? savedFingerprint);
             if (status == SshHostKeyStatus.Unknown)
             {
                 pendingFingerprint = fingerprint;
+            }
+            else if (status == SshHostKeyStatus.Changed)
+            {
+                SavedFingerprint = savedFingerprint;
+                PresentedFingerprint = fingerprint;
             }
 
             return status != SshHostKeyStatus.Changed;
