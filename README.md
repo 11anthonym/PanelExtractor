@@ -1,5 +1,7 @@
 # Panel Extractor
 
+<img src="Assets/PanelExtractor.png" alt="Panel Extractor icon" width="128">
+
 Panel Extractor downloads a deployed project from compatible Crestron® TSW touch panels and saves it as a `.vtz` archive.
 
 ## Requirements

@@ -9,6 +9,14 @@ namespace PanelExtractor
         public MainForm()
         {
             InitializeComponent();
+
+            System.Drawing.Icon? applicationIcon = System.Drawing.Icon.ExtractAssociatedIcon(
+                typeof(MainForm).Assembly.Location);
+            if (applicationIcon is not null)
+            {
+                Icon = applicationIcon;
+            }
+
             ApplyDetailsVisibility();
         }
 
@@ -176,16 +184,15 @@ namespace PanelExtractor
         private void btnBrowseOutput_Click(object sender, EventArgs e)
         {
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            using var dialog = new FolderBrowserDialog
-            {
-                Description = "Select where the extracted VTZ file should be saved",
-                SelectedPath = desktopPath
-            };
+            string? selectedFolder = ModernFolderPicker.Show(
+                this,
+                "Select where the extracted VTZ file should be saved",
+                desktopPath);
 
-            if (dialog.ShowDialog(this) == DialogResult.OK)
+            if (selectedFolder is not null)
             {
-                txtOutputFolder.Text = dialog.SelectedPath;
-                AppendLog($"Output folder selected: {dialog.SelectedPath}");
+                txtOutputFolder.Text = selectedFolder;
+                AppendLog($"Output folder selected: {selectedFolder}");
             }
         }
 
