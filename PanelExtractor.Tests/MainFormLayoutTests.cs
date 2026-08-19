@@ -28,9 +28,9 @@ public class MainFormLayoutTests
             Assert.AreEqual("PanelExtractor", typeof(MainForm).Assembly.GetName().Name);
             Assert.AreEqual("Panel Extractor", form.Text);
             using System.Drawing.Icon? executableIcon = System.Drawing.Icon.ExtractAssociatedIcon(
-                typeof(MainForm).Assembly.Location);
+                Application.ExecutablePath);
             Assert.IsNotNull(executableIcon);
-            CollectionAssert.AreEqual(ToPng(executableIcon), ToPng(form.Icon));
+            CollectionAssert.AreEqual(ToPng(executableIcon!), ToPng(form.Icon!));
             Assert.AreEqual("Allow legacy FTP fallback (unencrypted)", legacyFtp.Text);
             CollectionAssert.AreEqual(
                 new[] { "Exit" },

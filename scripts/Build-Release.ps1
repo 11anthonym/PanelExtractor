@@ -23,11 +23,16 @@ $dotnet = (Get-Command $DotNetPath -ErrorAction Stop).Source
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = "1"
 $env:DOTNET_NOLOGO = "1"
 
-$installedRuntimes = @(& $dotnet --list-runtimes)
-if ($LASTEXITCODE -ne 0 -or
-    !($installedRuntimes -match '^Microsoft\.NETCore\.App 8\.'))
+$installedSdks = @(& $dotnet --list-sdks)
+if ($LASTEXITCODE -ne 0 -or !($installedSdks -match '^10\.'))
 {
-    throw "Release generation requires the .NET 8 runtime for the pinned SBOM tool."
+    throw "Release generation requires the .NET 10 SDK."
+}
+
+$installedRuntimes = @(& $dotnet --list-runtimes)
+if ($LASTEXITCODE -ne 0 -or !($installedRuntimes -match '^Microsoft\.NETCore\.App 8\.'))
+{
+    throw "Release generation also requires the .NET 8 runtime for the pinned SBOM tool."
 }
 
 [xml]$project = Get-Content -LiteralPath (Join-Path $repoRoot "PanelExtractor.csproj") -Raw
@@ -76,6 +81,11 @@ try
     Invoke-DotNet -Arguments @(
         "publish", "PanelExtractor.csproj",
         "--configuration", "Release",
+        "--runtime", "win-x64",
+        "--self-contained", "true",
+        "-p:PublishSingleFile=true",
+        "-p:IncludeNativeLibrariesForSelfExtract=true",
+        "-p:EnableCompressionInSingleFile=true",
         "-p:DebugType=None",
         "-p:DebugSymbols=false",
         "-o", $releaseRoot)
@@ -84,6 +94,11 @@ try
     if ($executables.Count -ne 1)
     {
         throw "Expected one published executable; found $($executables.Count)."
+    }
+
+    if (@(Get-ChildItem -LiteralPath $releaseRoot -Filter "*.dll" -File).Count -ne 0)
+    {
+        throw "Expected a self-contained single-file executable, but DLLs were published beside it."
     }
 
     foreach ($notice in @("LICENSE", "THIRD-PARTY-NOTICES.md"))
