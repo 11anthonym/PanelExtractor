@@ -11,7 +11,7 @@ namespace PanelExtractor
             InitializeComponent();
 
             System.Drawing.Icon? applicationIcon = System.Drawing.Icon.ExtractAssociatedIcon(
-                typeof(MainForm).Assembly.Location);
+                Application.ExecutablePath);
             if (applicationIcon is not null)
             {
                 Icon = applicationIcon;

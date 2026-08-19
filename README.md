@@ -6,8 +6,10 @@ Panel Extractor downloads a deployed project from compatible Crestron® TSW touc
 
 ## Requirements
 
-- Windows 10 version 1903 or later, or Windows 11
+- 64-bit Windows 10, Windows 11, or Windows Server 2016 or later with Desktop Experience
 - Network access and valid panel credentials
+
+The release includes the required .NET runtime.
 
 ## Usage
 
@@ -24,7 +26,7 @@ Only use it on systems you own or manage.
 
 ## Development
 
-Requires the .NET 8 SDK or later. Release packaging also needs the .NET 8 runtime for the SBOM tool.
+Requires the .NET 10 SDK. Release packaging also needs the .NET 8 runtime for the SBOM tool.
 
 ```powershell
 dotnet test PanelExtractor.sln --configuration Release --filter "TestCategory!=Integration"
