@@ -55,7 +55,10 @@ public class PanelTransportSelectorTests
     [TestMethod]
     public async Task ConnectAsync_FallsBackWhenSftpCannotSeeDisplayDirectory()
     {
-        var sftp = new FakePanelFileClient("SFTP") { CanReadRequiredPath = false };
+        var sftp = new FakePanelFileClient("SFTP")
+        {
+            RequiredPathAccess = PanelDirectoryAccess.NotFound
+        };
         var ftp = new FakePanelFileClient("FTP");
         var selector = CreateSelector(SecureCandidate(() => sftp), LegacyCandidate(() => ftp));
 
@@ -67,6 +70,38 @@ public class PanelTransportSelectorTests
         );
 
         Assert.AreSame(ftp, selected);
+        Assert.IsTrue(sftp.WasDisposed);
+    }
+
+    [TestMethod]
+    public async Task ConnectAsync_DoesNotDowngradeWhenTheAccountMayNotReadTheProject()
+    {
+        var sftp = new FakePanelFileClient("SFTP")
+        {
+            RequiredPathAccess = PanelDirectoryAccess.PermissionDenied
+        };
+        bool ftpCreated = false;
+        var selector = CreateSelector(
+            SecureCandidate(() => sftp),
+            LegacyCandidate(() =>
+            {
+                ftpCreated = true;
+                return new FakePanelFileClient("FTP");
+            })
+        );
+
+        PanelAuthorizationException exception =
+            await Assert.ThrowsExactlyAsync<PanelAuthorizationException>(
+                () => selector.ConnectAsync(
+                    RequiredPath,
+                    allowLegacyFtp: true,
+                    _ => { },
+                    CancellationToken.None
+                )
+            );
+
+        StringAssert.Contains(exception.Message, "Administrators group");
+        Assert.IsFalse(ftpCreated);
         Assert.IsTrue(sftp.WasDisposed);
     }
 
@@ -96,7 +131,7 @@ public class PanelTransportSelectorTests
             )
         );
 
-        StringAssert.Contains(exception.Message, "Enable legacy FTP fallback");
+        StringAssert.Contains(exception.Message, "authentication turned off");
         Assert.IsFalse(ftpCreated);
     }
 
@@ -163,14 +198,40 @@ public class PanelTransportSelectorTests
         Assert.IsTrue(sftp.WasDisposed);
     }
 
+    [TestMethod]
+    public async Task ConnectAsync_GivesTheTransportSomewhereToReportPanelMessages()
+    {
+        var log = new List<string>();
+        var sftp = new FakePanelFileClient("SFTP");
+        var selector = CreateSelector(
+            new PanelTransportCandidate(
+                RequiresLegacyFtpPermission: false,
+                transportLog =>
+                {
+                    transportLog("Panel login banner: authorized use only.");
+                    return sftp;
+                })
+        );
+
+        using IReadOnlyPanelFileClient selected = await selector.ConnectAsync(
+            RequiredPath,
+            allowLegacyFtp: false,
+            log.Add,
+            CancellationToken.None
+        );
+
+        Assert.AreSame(sftp, selected);
+        CollectionAssert.Contains(log, "Panel login banner: authorized use only.");
+    }
+
     private static PanelTransportSelector CreateSelector(params PanelTransportCandidate[] candidates) =>
         new(candidates);
 
     private static PanelTransportCandidate SecureCandidate(Func<IReadOnlyPanelFileClient> factory) =>
-        new(RequiresLegacyFtpPermission: false, factory);
+        new(RequiresLegacyFtpPermission: false, _ => factory());
 
     private static PanelTransportCandidate LegacyCandidate(Func<IReadOnlyPanelFileClient> factory) =>
-        new(RequiresLegacyFtpPermission: true, factory);
+        new(RequiresLegacyFtpPermission: true, _ => factory());
 
     private static PanelTransportUnavailableException Unavailable(string message) =>
         new(message, new IOException(message));
@@ -181,7 +242,7 @@ public class PanelTransportSelectorTests
 
         public Exception? ConnectException { get; init; }
 
-        public bool CanReadRequiredPath { get; init; } = true;
+        public PanelDirectoryAccess RequiredPathAccess { get; init; } = PanelDirectoryAccess.Readable;
 
         public int DirectoryProbeCount { get; private set; }
 
@@ -196,10 +257,12 @@ public class PanelTransportSelectorTests
                 : Task.FromException(ConnectException);
         }
 
-        public Task<bool> CanReadDirectoryAsync(string path, CancellationToken cancellationToken)
+        public Task<PanelDirectoryAccess> CheckDirectoryAccessAsync(
+            string path,
+            CancellationToken cancellationToken)
         {
             DirectoryProbeCount++;
-            return Task.FromResult(CanReadRequiredPath);
+            return Task.FromResult(RequiredPathAccess);
         }
 
         public async IAsyncEnumerable<PanelFileEntry> ListDirectoryAsync(

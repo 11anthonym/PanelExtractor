@@ -2,7 +2,7 @@ namespace PanelExtractor
 {
     internal readonly record struct PanelTransportCandidate(
         bool RequiresLegacyFtpPermission,
-        Func<IReadOnlyPanelFileClient> CreateClient
+        Func<Action<string>, IReadOnlyPanelFileClient> CreateClient
     );
 
     internal sealed class PanelTransportSelector
@@ -28,11 +28,11 @@ namespace PanelExtractor
             [
                 new PanelTransportCandidate(
                     RequiresLegacyFtpPermission: false,
-                    () => new ReadOnlySftpClient(host, username, password)
+                    log => new ReadOnlySftpClient(host, username, password, log)
                 ),
                 new PanelTransportCandidate(
                     RequiresLegacyFtpPermission: true,
-                    () => new ReadOnlyFtpClient(host, username, password)
+                    _ => new ReadOnlyFtpClient(host, username, password)
                 )
             ]);
         }
@@ -53,7 +53,7 @@ namespace PanelExtractor
                     continue;
                 }
 
-                IReadOnlyPanelFileClient client = candidate.CreateClient();
+                IReadOnlyPanelFileClient client = candidate.CreateClient(log);
                 bool selected = false;
 
                 try
@@ -61,9 +61,24 @@ namespace PanelExtractor
                     log($"Trying {client.ProtocolName}.");
                     await client.ConnectAsync(cancellationToken);
 
-                    if (!await client.CanReadDirectoryAsync(requiredPath, cancellationToken))
+                    PanelDirectoryAccess access = await client.CheckDirectoryAccessAsync(
+                        requiredPath,
+                        cancellationToken);
+
+                    if (access == PanelDirectoryAccess.PermissionDenied)
                     {
-                        log($"{client.ProtocolName} connected, but {requiredPath} could not be read.");
+                        // The credentials were good, so another transport would fail the same
+                        // way and would spend a second login attempt against the panel.
+                        log($"{client.ProtocolName} signed in, but {requiredPath} is not readable by this account.");
+
+                        throw new PanelAuthorizationException(
+                            $"The panel accepted these credentials, but this account cannot read {requiredPath}. " +
+                            "Use an account in the panel's Administrators group.");
+                    }
+
+                    if (access == PanelDirectoryAccess.NotFound)
+                    {
+                        log($"{client.ProtocolName} connected, but {requiredPath} could not be found.");
                         continue;
                     }
 
@@ -87,7 +102,9 @@ namespace PanelExtractor
 
             string message = allowLegacyFtp
                 ? $"Neither SFTP nor FTP could read {requiredPath}."
-                : $"SFTP could not read {requiredPath}. Enable legacy FTP fallback only if this panel requires unencrypted FTP.";
+                : $"SFTP could not read {requiredPath}. Legacy FTP fallback only helps an older " +
+                  "panel that has authentication turned off; panels with authentication on, and " +
+                  "the newest panels, do not run an FTP server at all.";
 
             throw new PanelConnectionException(message, lastUnavailableException);
         }

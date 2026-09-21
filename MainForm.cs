@@ -75,6 +75,8 @@ namespace PanelExtractor
                 return false;
             }
 
+            // A panel that still takes a blank password has never had an account created, so it
+            // has no project loaded and nothing to extract. Stop before spending a login attempt.
             if (string.IsNullOrWhiteSpace(password))
             {
                 ShowValidationError("Missing password.", "Enter a password.", "Missing Password");
@@ -424,7 +426,10 @@ namespace PanelExtractor
         {
             MessageBox.Show(
                 "Enter the panel address and credentials. Test Connection can be used to confirm the panel is reachable before extracting.\n\n" +
-                "SFTP is always tried first. Enable legacy FTP fallback only for older panels that require unencrypted FTP.\n\n" +
+                "Use an account in the panel's Administrators group; lower access levels can sign in but cannot read the project folder.\n\n" +
+                "A panel with authentication turned off is reached with its default credentials.\n\n" +
+                "Panels lock the account and block this computer after a few failed sign-in attempts, so check credentials rather than retrying.\n\n" +
+                "SFTP is always tried first. Legacy FTP fallback only helps an older panel with authentication turned off; turning authentication on disables the panel's FTP server, and the newest panels have none.\n\n" +
                 "The first successful SFTP connection remembers the panel's SSH identity. If it later changes, only that panel's new identity can be approved.\n\n" +
                 "Extract VTZ downloads the deployed touch panel files and packages them into a VTZ archive.\n\n" +
                 "If no output folder is selected, the file is saved in the same folder the program was launched from.\n\n" +

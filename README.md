@@ -18,7 +18,15 @@ The release includes the required .NET runtime.
 3. Choose an output folder.
 4. Select **Test Connection**, then **Extract VTZ**.
 
-Leave the output folder blank to save beside the application. For panels without SFTP, enable **Allow legacy FTP fallback (unencrypted)**.
+Leave the output folder blank to save beside the application.
+
+## Panel access
+
+- Sign in with an account in the panel's **Administrators** group. Lower access levels authenticate successfully but cannot read the project folder.
+- A panel with authentication turned off is reached with its default credentials. A panel that still takes a blank password has never had an account created, so it has no project to extract.
+- Panels lock the account and block the connecting computer's IP address after a few failed attempts. Check credentials rather than retrying.
+- SFTP is always tried first. **Allow legacy FTP fallback (unencrypted)** only helps an older panel that has authentication turned off: turning authentication on disables the panel's FTP server, and the newest panels do not run one at all.
+- Panels that require a second authentication factor cannot be read by this application.
 
 Panel access is read-only: the application does not upload, delete, rename, or run remote commands.
 
