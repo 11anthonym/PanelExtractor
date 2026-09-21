@@ -7,6 +7,15 @@ namespace PanelExtractor
         Directory
     }
 
+    // Separates "this panel does not expose the folder" from "this account may not read it",
+    // because only the first is a reason to try another transport.
+    internal enum PanelDirectoryAccess
+    {
+        Readable,
+        NotFound,
+        PermissionDenied
+    }
+
     internal readonly record struct PanelFileEntry(string Name, long Length, PanelFileKind Kind);
 
     internal interface IReadOnlyPanelFileClient : IDisposable
@@ -15,7 +24,10 @@ namespace PanelExtractor
 
         Task ConnectAsync(CancellationToken cancellationToken);
 
-        Task<bool> CanReadDirectoryAsync(string path, CancellationToken cancellationToken);
+        Task<PanelDirectoryAccess> CheckDirectoryAccessAsync(
+            string path,
+            CancellationToken cancellationToken
+        );
 
         IAsyncEnumerable<PanelFileEntry> ListDirectoryAsync(
             string path,
@@ -36,6 +48,13 @@ namespace PanelExtractor
 
     internal sealed class PanelAuthenticationException(string message, Exception innerException)
         : PanelConnectionException(message, innerException)
+    {
+    }
+
+    // The credentials were accepted but the account cannot read the project folder.
+    // Retrying on another transport would only spend a second login attempt.
+    internal sealed class PanelAuthorizationException(string message)
+        : PanelConnectionException(message)
     {
     }
 

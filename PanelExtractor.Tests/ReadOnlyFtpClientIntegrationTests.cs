@@ -21,8 +21,12 @@ public class ReadOnlyFtpClientIntegrationTests
         using var client = new ReadOnlyFtpClient(host, username, password, int.Parse(portText));
         await client.ConnectAsync(CancellationToken.None);
 
-        Assert.IsTrue(await client.CanReadDirectoryAsync("/display", CancellationToken.None));
-        Assert.IsFalse(await client.CanReadDirectoryAsync("/missing", CancellationToken.None));
+        Assert.AreEqual(
+            PanelDirectoryAccess.Readable,
+            await client.CheckDirectoryAccessAsync("/display", CancellationToken.None));
+        Assert.AreEqual(
+            PanelDirectoryAccess.NotFound,
+            await client.CheckDirectoryAccessAsync("/missing", CancellationToken.None));
 
         var entries = new List<PanelFileEntry>();
         await foreach (PanelFileEntry entry in client.ListDirectoryAsync("/display", CancellationToken.None))

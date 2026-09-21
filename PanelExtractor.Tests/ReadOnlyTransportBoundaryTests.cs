@@ -12,7 +12,7 @@ public class ReadOnlyTransportBoundaryTests
     {
         string[] expectedMethods =
         [
-            "CanReadDirectoryAsync",
+            "CheckDirectoryAccessAsync",
             "ConnectAsync",
             "Dispose",
             "DownloadFileAsync",
@@ -49,7 +49,7 @@ public class ReadOnlyTransportBoundaryTests
     {
         string[] expectedMethods =
         [
-            "CanReadDirectoryAsync",
+            "CheckDirectoryAccessAsync",
             "ConnectAsync",
             "DownloadFileAsync",
             "ListDirectoryAsync"

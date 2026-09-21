@@ -8,7 +8,7 @@ namespace PanelExtractor
     // Keeps FluentFTP's mutation-capable types behind a read-only application surface.
     internal sealed class ReadOnlyFtpClient : IReadOnlyPanelFileClient
     {
-        private const int TimeoutMilliseconds = 5000;
+        private const int TimeoutMilliseconds = 15000;
 
         private readonly AsyncFtpClient client;
 
@@ -37,7 +37,11 @@ namespace PanelExtractor
             }
             catch (FtpAuthenticationException ex)
             {
-                throw new PanelAuthenticationException("FTP authentication failed.", ex);
+                throw new PanelAuthenticationException(
+                    "FTP authentication failed. Panels can lock the account and block this " +
+                    "computer's IP address after a few failed attempts, so check the " +
+                    "credentials before trying again.",
+                    ex);
             }
             catch (Exception ex) when (ex is FtpException or SocketException or IOException or TimeoutException)
             {
@@ -45,7 +49,7 @@ namespace PanelExtractor
             }
         }
 
-        public async Task<bool> CanReadDirectoryAsync(
+        public async Task<PanelDirectoryAccess> CheckDirectoryAccessAsync(
             string path,
             CancellationToken cancellationToken)
         {
@@ -56,11 +60,13 @@ namespace PanelExtractor
                     break;
                 }
 
-                return true;
+                return PanelDirectoryAccess.Readable;
             }
             catch (FtpCommandException)
             {
-                return false;
+                // FTP answers both "no such folder" and "not allowed" with the same 550 reply,
+                // so this cannot be reported as a privilege problem the way SFTP can.
+                return PanelDirectoryAccess.NotFound;
             }
         }
 
