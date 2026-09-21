@@ -16,8 +16,8 @@ The release includes the required .NET runtime.
 1. Extract the release ZIP and open `PanelExtractor.exe`.
 2. Enter the panel address and credentials.
 3. Choose an output folder.
-4. Select **Test Connection**, then **Extract VTZ**.
-5. Optionally open the finished archive in Crestron XPanel when prompted.
+4. Tick **Open in Crestron XPanel after extracting** if the finished archive should be launched.
+5. Select **Test Connection**, then **Extract VTZ**.
 
 Leave the output folder blank to save beside the application.
 
@@ -32,6 +32,8 @@ Leave the output folder blank to save beside the application.
 Panel access is read-only: the application does not upload, delete, rename, or run remote commands.
 
 ## Opening the archive
+
+**Open in Crestron XPanel after extracting** is off unless selected, so extraction starts nothing on its own.
 
 Crestron XPanel is the only application that reads a `.vtz`. Installing XPanel lists it among the extension's candidate handlers but sets no default association, so the archive is started with XPanel directly rather than handed to the shell. XPanel is looked for under both program folders and at whatever location its installer registered.
 

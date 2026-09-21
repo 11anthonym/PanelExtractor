@@ -25,7 +25,7 @@ namespace PanelExtractor
             txtLog.Visible = showDetails;
             lblLog.Visible = showDetails;
             btnToggleDetails.Text = showDetails ? "Hide Details" : "Show Details";
-            ClientSize = new Size(500, showDetails ? 416 : 337);
+            ClientSize = new Size(500, showDetails ? 442 : 363);
         }
 
         private void AppendLog(string message)
@@ -51,6 +51,7 @@ namespace PanelExtractor
             btnTestConnection.Enabled = !isBusy;
             btnBrowseOutput.Enabled = !isBusy;
             chkAllowLegacyFtp.Enabled = !isBusy;
+            chkOpenInXPanel.Enabled = !isBusy;
 
             Cursor = isBusy ? Cursors.WaitCursor : Cursors.Default;
         }
@@ -401,15 +402,14 @@ namespace PanelExtractor
                 AppendLog("VTZ archive created successfully.");
                 AppendLog($"Extraction complete. Output file: {outputVtzPath}");
 
-                DialogResult openResult = MessageBox.Show(
-                    $"VTZ created successfully:{Environment.NewLine}{outputVtzPath}" +
-                    $"{Environment.NewLine}{Environment.NewLine}Open it in Crestron XPanel now?",
+                MessageBox.Show(
+                    $"VTZ created successfully:{Environment.NewLine}{outputVtzPath}",
                     "Extraction Complete",
-                    MessageBoxButtons.YesNo,
+                    MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
 
-                if (openResult == DialogResult.Yes)
+                if (chkOpenInXPanel.Checked)
                 {
                     OpenInXPanel(outputVtzPath);
                 }
@@ -473,7 +473,7 @@ namespace PanelExtractor
                 "SFTP is always tried first. Legacy FTP fallback only helps an older panel with authentication turned off; turning authentication on disables the panel's FTP server, and the newest panels have none.\n\n" +
                 "The first successful SFTP connection remembers the panel's SSH identity. If it later changes, only that panel's new identity can be approved.\n\n" +
                 "Extract VTZ downloads the deployed touch panel files and packages them into a VTZ archive.\n\n" +
-                "A finished VTZ can be opened in Crestron XPanel. Nothing else reads the format, so if XPanel is not installed the file is still saved and a download link is shown.\n\n" +
+                "Tick Open in Crestron XPanel after extracting to launch the finished archive. It stays off unless selected. Nothing but XPanel reads the format, so if XPanel is not installed the file is still saved and a download link is shown.\n\n" +
                 "If no output folder is selected, the file is saved in the same folder the program was launched from.\n\n" +
                 "If a file with the same name already exists, a numbered copy is created instead of overwriting it.\n\n" +
                 "Use Show Details to view connection and extraction progress.",

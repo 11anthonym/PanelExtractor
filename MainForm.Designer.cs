@@ -50,6 +50,7 @@
             aboutToolStripMenuItem = new ToolStripMenuItem();
             howThisWorksToolStripMenuItem = new ToolStripMenuItem();
             chkAllowLegacyFtp = new CheckBox();
+            chkOpenInXPanel = new CheckBox();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -138,53 +139,63 @@
             btnBrowseOutput.Text = "Browse...";
             btnBrowseOutput.UseVisualStyleBackColor = true;
             btnBrowseOutput.Click += btnBrowseOutput_Click;
-            // 
+            //
+            // chkOpenInXPanel
+            //
+            chkOpenInXPanel.AutoSize = true;
+            chkOpenInXPanel.Location = new Point(112, 185);
+            chkOpenInXPanel.Name = "chkOpenInXPanel";
+            chkOpenInXPanel.Size = new Size(238, 19);
+            chkOpenInXPanel.TabIndex = 10;
+            chkOpenInXPanel.Text = "Open in Crestron XPanel after extracting";
+            chkOpenInXPanel.UseVisualStyleBackColor = true;
+            //
             // btnExtract
-            // 
-            btnExtract.Location = new Point(265, 191);
+            //
+            btnExtract.Location = new Point(265, 217);
             btnExtract.Name = "btnExtract";
             btnExtract.Size = new Size(103, 23);
-            btnExtract.TabIndex = 10;
+            btnExtract.TabIndex = 11;
             btnExtract.Text = "Extract VTZ";
             btnExtract.UseVisualStyleBackColor = true;
             btnExtract.Click += btnExtract_Click;
             // 
             // btnTestConnection
             // 
-            btnTestConnection.Location = new Point(129, 191);
+            btnTestConnection.Location = new Point(129, 217);
             btnTestConnection.Name = "btnTestConnection";
             btnTestConnection.Size = new Size(103, 23);
-            btnTestConnection.TabIndex = 11;
+            btnTestConnection.TabIndex = 12;
             btnTestConnection.Text = "Test Connection";
             btnTestConnection.UseVisualStyleBackColor = true;
             btnTestConnection.Click += btnTestConnection_Click;
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(2, 303);
+            txtLog.Location = new Point(2, 329);
             txtLog.Multiline = true;
             txtLog.Name = "txtLog";
             txtLog.ReadOnly = true;
             txtLog.ScrollBars = ScrollBars.Vertical;
             txtLog.Size = new Size(481, 90);
-            txtLog.TabIndex = 12;
+            txtLog.TabIndex = 13;
             // 
             // lblStatus
             // 
             lblStatus.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblStatus.Location = new Point(17, 217);
+            lblStatus.Location = new Point(17, 243);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(450, 25);
-            lblStatus.TabIndex = 14;
+            lblStatus.TabIndex = 15;
             lblStatus.Text = "Ready";
             lblStatus.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // btnToggleDetails
             // 
-            btnToggleDetails.Location = new Point(198, 254);
+            btnToggleDetails.Location = new Point(198, 280);
             btnToggleDetails.Name = "btnToggleDetails";
             btnToggleDetails.Size = new Size(88, 23);
-            btnToggleDetails.TabIndex = 15;
+            btnToggleDetails.TabIndex = 16;
             btnToggleDetails.Text = "Show Details";
             btnToggleDetails.UseVisualStyleBackColor = true;
             btnToggleDetails.Click += btnToggleDetails_Click;
@@ -192,10 +203,10 @@
             // lblLog
             // 
             lblLog.AutoSize = true;
-            lblLog.Location = new Point(220, 285);
+            lblLog.Location = new Point(220, 311);
             lblLog.Name = "lblLog";
             lblLog.Size = new Size(45, 15);
-            lblLog.TabIndex = 13;
+            lblLog.TabIndex = 14;
             lblLog.Text = "Details:";
             // 
             // menuStrip1
@@ -204,7 +215,7 @@
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(484, 24);
-            menuStrip1.TabIndex = 16;
+            menuStrip1.TabIndex = 17;
             menuStrip1.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
@@ -248,6 +259,7 @@
             BackColor = Color.LightSkyBlue;
             ClientSize = new Size(484, 416);
             Controls.Add(chkAllowLegacyFtp);
+            Controls.Add(chkOpenInXPanel);
             Controls.Add(btnToggleDetails);
             Controls.Add(lblStatus);
             Controls.Add(lblLog);
@@ -299,5 +311,6 @@
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolStripMenuItem howThisWorksToolStripMenuItem;
         private CheckBox chkAllowLegacyFtp;
+        private CheckBox chkOpenInXPanel;
     }
 }

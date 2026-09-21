@@ -47,6 +47,38 @@ public class MainFormLayoutTests
     }
 
     [TestMethod]
+    public void OpenInXPanel_IsOffUntilChosenAndFitsBesideTheOtherControls()
+    {
+        RunOnStaThread(() =>
+        {
+            using var form = new MainForm();
+            form.Show();
+            Application.DoEvents();
+
+            CheckBox openInXPanel = FindControl<CheckBox>(form, "chkOpenInXPanel");
+            CheckBox legacyFtp = FindControl<CheckBox>(form, "chkAllowLegacyFtp");
+            TextBox outputFolder = FindControl<TextBox>(form, "txtOutputFolder");
+            Button extract = FindControl<Button>(form, "btnExtract");
+
+            // Extraction must not launch anything unless the operator asks for it.
+            Assert.IsFalse(openInXPanel.Checked);
+            Assert.AreEqual("Open in Crestron XPanel after extracting", openInXPanel.Text);
+
+            Assert.IsTrue(form.ClientRectangle.Contains(openInXPanel.Bounds));
+            Assert.IsGreaterThanOrEqualTo(openInXPanel.Width, openInXPanel.PreferredSize.Width);
+            Assert.IsFalse(openInXPanel.Bounds.IntersectsWith(outputFolder.Bounds));
+            Assert.IsFalse(openInXPanel.Bounds.IntersectsWith(legacyFtp.Bounds));
+            Assert.IsFalse(openInXPanel.Bounds.IntersectsWith(extract.Bounds));
+
+            typeof(MainForm)
+                .GetMethod("SetBusyState", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(form, [true]);
+
+            Assert.IsFalse(openInXPanel.Enabled);
+        });
+    }
+
+    [TestMethod]
     public void DetailsToggle_RemainsInteractiveWhileBusy()
     {
         RunOnStaThread(() =>
