@@ -17,6 +17,7 @@ The release includes the required .NET runtime.
 2. Enter the panel address and credentials.
 3. Choose an output folder.
 4. Select **Test Connection**, then **Extract VTZ**.
+5. Optionally open the finished archive in Crestron XPanel when prompted.
 
 Leave the output folder blank to save beside the application.
 
@@ -27,6 +28,12 @@ Leave the output folder blank to save beside the application.
 - Panels lock the account and block the connecting computer's IP address after a few failed attempts. Check credentials rather than retrying.
 - SFTP is always tried first. **Allow legacy FTP fallback (unencrypted)** only helps an older panel that has authentication turned off: turning authentication on disables the panel's FTP server, and the newest panels do not run one at all.
 - Panels that require a second authentication factor cannot be read by this application.
+
+## Opening the archive
+
+Crestron XPanel is the only application that reads a `.vtz`, and Windows registers no handler for the extension, so the archive is offered to XPanel directly rather than to the shell. XPanel is looked for under both program folders and at whatever location its installer registered.
+
+If XPanel is not installed the archive is still saved, and a link to the [XPanel Desktop installer](https://www.crestron.com/Resources/XPanel-Desktop-Installer) is shown.
 
 Panel access is read-only: the application does not upload, delete, rename, or run remote commands.
 
