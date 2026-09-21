@@ -29,6 +29,8 @@ Leave the output folder blank to save beside the application.
 - SFTP is always tried first. **Allow legacy FTP fallback (unencrypted)** only helps an older panel that has authentication turned off: turning authentication on disables the panel's FTP server, and the newest panels do not run one at all.
 - Panels that require a second authentication factor cannot be read by this application.
 
+Panel access is read-only: the application does not upload, delete, rename, or run remote commands.
+
 ## Opening the archive
 
 Crestron XPanel is the only application that reads a `.vtz`. Installing XPanel lists it among the extension's candidate handlers but sets no default association, so the archive is started with XPanel directly rather than handed to the shell. XPanel is looked for under both program folders and at whatever location its installer registered.
@@ -36,8 +38,6 @@ Crestron XPanel is the only application that reads a `.vtz`. Installing XPanel l
 XPanel can fail to load a project from a long or deeply nested path, opening an empty window instead. Choosing an ordinary output folder avoids this.
 
 If XPanel is not installed the archive is still saved, and a link to the [XPanel Desktop installer](https://www.crestron.com/Resources/XPanel-Desktop-Installer) is shown.
-
-Panel access is read-only: the application does not upload, delete, rename, or run remote commands.
 
 Only use it on systems you own or manage.
 

@@ -30,6 +30,14 @@ namespace PanelExtractor
 
         private void AppendLog(string message)
         {
+            // The transport reports a panel's SSH login banner from the SSH message thread, so
+            // this can arrive off the UI thread.
+            if (InvokeRequired)
+            {
+                BeginInvoke(() => AppendLog(message));
+                return;
+            }
+
             txtLog.AppendText($"{DateTime.Now:HH:mm:ss} - {message}{Environment.NewLine}");
 
             // Keep the Details box scrolled to the newest line.

@@ -46,7 +46,7 @@ namespace PanelExtractor
     {
     }
 
-    internal sealed class PanelAuthenticationException(string message, Exception? innerException = null)
+    internal sealed class PanelAuthenticationException(string message, Exception innerException)
         : PanelConnectionException(message, innerException)
     {
     }
