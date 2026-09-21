@@ -215,6 +215,33 @@ namespace PanelExtractor
             AppendLog($"Finished folder: {remoteDirectory}");
         }
 
+        private void OpenInXPanel(string vtzPath)
+        {
+            AppendLog("Looking for Crestron XPanel.");
+
+            XPanelLaunchResult result = XPanelLauncher.CreateDefault().Launch(vtzPath);
+            AppendLog(result.Message);
+
+            if (result.Outcome == XPanelLaunchOutcome.Started)
+            {
+                return;
+            }
+
+            string detail = result.Outcome == XPanelLaunchOutcome.NotInstalled
+                ? "Crestron XPanel was not found on this computer. A VTZ archive can only be " +
+                  $"opened with XPanel, which can be installed from:{Environment.NewLine}" +
+                  XPanelLauncher.DownloadUrl
+                : result.Message;
+
+            MessageBox.Show(
+                $"{detail}{Environment.NewLine}{Environment.NewLine}The VTZ was still saved to:" +
+                $"{Environment.NewLine}{vtzPath}",
+                "Could Not Open XPanel",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning
+            );
+        }
+
         private async Task DeleteTempExtractionFolderAsync(string? folder)
         {
             if (folder is null || !Directory.Exists(folder))
@@ -364,12 +391,18 @@ namespace PanelExtractor
                 AppendLog("VTZ archive created successfully.");
                 AppendLog($"Extraction complete. Output file: {outputVtzPath}");
 
-                MessageBox.Show(
-                    $"VTZ created successfully:{Environment.NewLine}{outputVtzPath}",
+                DialogResult openResult = MessageBox.Show(
+                    $"VTZ created successfully:{Environment.NewLine}{outputVtzPath}" +
+                    $"{Environment.NewLine}{Environment.NewLine}Open it in Crestron XPanel now?",
                     "Extraction Complete",
-                    MessageBoxButtons.OK,
+                    MessageBoxButtons.YesNo,
                     MessageBoxIcon.Information
                 );
+
+                if (openResult == DialogResult.Yes)
+                {
+                    OpenInXPanel(outputVtzPath);
+                }
             }
             catch (Exception ex)
             {
@@ -427,6 +460,7 @@ namespace PanelExtractor
                 "SFTP is always tried first. Enable legacy FTP fallback only for older panels that require unencrypted FTP.\n\n" +
                 "The first successful SFTP connection remembers the panel's SSH identity. If it later changes, only that panel's new identity can be approved.\n\n" +
                 "Extract VTZ downloads the deployed touch panel files and packages them into a VTZ archive.\n\n" +
+                "A finished VTZ can be opened in Crestron XPanel. Nothing else reads the format, so if XPanel is not installed the file is still saved and a download link is shown.\n\n" +
                 "If no output folder is selected, the file is saved in the same folder the program was launched from.\n\n" +
                 "If a file with the same name already exists, a numbered copy is created instead of overwriting it.\n\n" +
                 "Use Show Details to view connection and extraction progress.",
