@@ -31,7 +31,9 @@ Leave the output folder blank to save beside the application.
 
 ## Opening the archive
 
-Crestron XPanel is the only application that reads a `.vtz`, and Windows registers no handler for the extension, so the archive is offered to XPanel directly rather than to the shell. XPanel is looked for under both program folders and at whatever location its installer registered.
+Crestron XPanel is the only application that reads a `.vtz`. Installing XPanel lists it among the extension's candidate handlers but sets no default association, so the archive is started with XPanel directly rather than handed to the shell. XPanel is looked for under both program folders and at whatever location its installer registered.
+
+XPanel can fail to load a project from a long or deeply nested path, opening an empty window instead. Choosing an ordinary output folder avoids this.
 
 If XPanel is not installed the archive is still saved, and a link to the [XPanel Desktop installer](https://www.crestron.com/Resources/XPanel-Desktop-Installer) is shown.
 

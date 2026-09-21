@@ -13,8 +13,10 @@ namespace PanelExtractor
     internal readonly record struct XPanelLaunchResult(XPanelLaunchOutcome Outcome, string Message);
 
     // A VTZ archive is only meaningful to Crestron XPanel, so this looks for that one program
-    // rather than handing the file to whatever Windows happens to associate with the extension.
-    // Windows registers no handler for .vtz by default, so there is usually nothing to hand it to.
+    // rather than handing the file to the shell. Installing XPanel lists it under the extension's
+    // OpenWithProgIds but sets no default handler, so .vtz still has no association for the shell
+    // to act on. Starting the program directly matches the command that association would run:
+    // "CrestronXPanel.exe" "%1".
     internal sealed class XPanelLauncher
     {
         public const string DownloadUrl = "https://www.crestron.com/Resources/XPanel-Desktop-Installer";
